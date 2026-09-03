@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
+import { PageTransition } from "@/components/page-transition";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -21,7 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           collapsed ? "md:ml-[70px]" : "md:ml-[260px]"
         }`}
       >
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </>
   );

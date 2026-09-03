@@ -1,0 +1,109 @@
+{
+  "Hero": {
+    "badge": "متاح لمشاريع جديدة",
+    "greeting": "مرحباً، أنا",
+    "description": "أُصمم وأُطوّر حلولاً رقمية مخصصة — مواقع ويب، تطبيقات جوّال، تطبيقات سطح مكتب وأنظمة متكاملة — لعملاء يريدون نتيجة احترافية.",
+    "ctaProjects": "شاهد مشاريعي",
+    "ctaContact": "تواصل معي"
+  },
+  "About": {
+    "title": "نبذة عني",
+    "description": "طالب ماجستير في هندسة البرمجيات بجامعة USTHB بالجزائر العاصمة، أُطوّر تطبيقات ويب وجوّال وسطح مكتب لعملاء محترفين منذ سنتين. شغوف بابتكار حلول رقمية متكاملة، أعمل ضمن فريق من المطورين على مشاريع حقيقية وطموحة.",
+    "stats": {
+      "projects": "مشاريع منجزة",
+      "experience": "سنوات خبرة",
+      "clients": "عملاء نشطون"
+    }
+  },
+  "Skills": {
+    "title": "المهارات",
+    "categories": {
+      "frontend": "الواجهة الأمامية",
+      "backend": "الخلفية",
+      "mobile": "الجوال",
+      "tools": "الأدوات"
+    }
+  },
+  "Projects": {
+    "title": "المشاريع",
+    "ctaLive": "شاهد المشروع",
+    "ctaGithub": "GitHub",
+    "categories": {
+      "web": "ويب",
+      "mobile": "جوال",
+      "desktop": "سطح المكتب"
+    },
+    "items": {
+      "quickDelivery": {
+        "title": "Quick Delivery",
+        "description": "منصة توصيل مع تتبع مباشر، تربط تطبيق ويب بتطبيق جوال."
+      },
+      "mcaStadium": {
+        "title": "MCA Stadium",
+        "description": "نظام لإدارة دخول الملعب باستخدام تقنية RFID لتحكم سريع وآمن في الوصول."
+      },
+      "autoCare": {
+        "title": "AutoCare",
+        "description": "تطبيق جوال لإدارة المركبات: الصيانة، السجل، وتذكيرات مخصصة."
+      },
+      "ecommerce": {
+        "title": "E-Commerce",
+        "description": "متجر إلكتروني ديناميكي مع كتالوج منتجات وسلة شراء ودفع آمن."
+      }
+    }
+  },
+  "Experience": {
+    "title": "الخبرة",
+    "items": {
+      "internship": {
+        "role": "مطور ويب",
+        "company": "SARL SIGEAD Infinity-Prod",
+        "period": "صيف 2024",
+        "description": "تدريب لمدة شهر في تطوير الويب."
+      },
+      "freelance": {
+        "role": "مطور مستقل",
+        "company": "مستقل",
+        "period": "2023 → الحاضر",
+        "description": "تطوير تطبيقات ويب وجوال وسطح مكتب لعملاء محترفين."
+      }
+    }
+  },
+  "Contact": {
+    "title": "تواصل",
+    "invite": "لديك فكرة مشروع؟ لنتحدث عنها.",
+    "form": {
+      "name": "الاسم",
+      "namePlaceholder": "اسمك",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "subject": "الموضوع",
+      "subjectPlaceholder": "موضوع رسالتك",
+      "message": "الرسالة",
+      "messagePlaceholder": "حدثني عن مشروعك...",
+      "send": "إرسال",
+      "sending": "جارٍ الإرسال...",
+      "successAlert": "شكراً! تم إرسال رسالتك بنجاح.",
+      "errorAlert": "عذراً، فشل الإرسال. أعد المحاولة أو راسلني مباشرة عبر البريد الإلكتروني."
+    }
+  },
+  "Nav": {
+    "hero": "الرئيسية",
+    "about": "نبذة عني",
+    "skills": "المهارات",
+    "projects": "المشاريع",
+    "experience": "الخبرة",
+    "contact": "تواصل"
+  },
+  "Sidebar": {
+    "themeLight": "الوضع الفاتح",
+    "themeDark": "الوضع الداكن",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "collapseMenu": "طي القائمة",
+    "expandMenu": "توسيع القائمة"
+  },
+  "LanguageSwitcher": {
+    "label": "اللغة"
+  }
+}

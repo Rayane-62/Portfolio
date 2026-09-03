@@ -51,7 +51,7 @@ export function Typewriter({
   }, [text, phase, wordIndex, words, typingSpeed, deletingSpeed, pauseDuration]);
 
   return (
-    <span className={className}>
+    <span className={className} dir="auto">
       {text}
       <span className="ml-0.5 inline-block w-[2px] animate-pulse bg-[var(--accent)] align-middle" style={{ height: "1em" }} />
     </span>

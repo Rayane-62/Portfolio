@@ -1,0 +1,109 @@
+{
+  "Hero": {
+    "badge": "Disponible para nuevos proyectos",
+    "greeting": "Hola, soy",
+    "description": "Diseño y desarrollo soluciones digitales a medida — sitios web, aplicaciones móviles, aplicaciones de escritorio y sistemas completos — para clientes que quieren un resultado profesional.",
+    "ctaProjects": "Ver mis proyectos",
+    "ctaContact": "Contáctame"
+  },
+  "About": {
+    "title": "Sobre mí",
+    "description": "Estudiante de Máster en Ingeniería del Software en la USTHB de Argel, desarrollo aplicaciones web, móviles y de escritorio para clientes profesionales desde hace 2 años. Apasionado por crear soluciones digitales completas, trabajo con un equipo de desarrolladores en proyectos reales y ambiciosos.",
+    "stats": {
+      "projects": "Proyectos realizados",
+      "experience": "Años de experiencia",
+      "clients": "Clientes activos"
+    }
+  },
+  "Skills": {
+    "title": "Habilidades",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "mobile": "Móvil",
+      "tools": "Herramientas"
+    }
+  },
+  "Projects": {
+    "title": "Proyectos",
+    "ctaLive": "Ver proyecto",
+    "ctaGithub": "GitHub",
+    "categories": {
+      "web": "Web",
+      "mobile": "Móvil",
+      "desktop": "Escritorio"
+    },
+    "items": {
+      "quickDelivery": {
+        "title": "Quick Delivery",
+        "description": "Plataforma de entrega con seguimiento en tiempo real, conectando una app web y móvil."
+      },
+      "mcaStadium": {
+        "title": "MCA Stadium",
+        "description": "Sistema de gestión de entrada al estadio mediante tecnología RFID para un control de acceso rápido y seguro."
+      },
+      "autoCare": {
+        "title": "AutoCare",
+        "description": "Aplicación móvil de gestión de vehículos: mantenimiento, historial y recordatorios personalizados."
+      },
+      "ecommerce": {
+        "title": "E-Commerce",
+        "description": "Tienda en línea dinámica con catálogo de productos, carrito y pago seguro."
+      }
+    }
+  },
+  "Experience": {
+    "title": "Experiencia",
+    "items": {
+      "internship": {
+        "role": "Desarrollador Web",
+        "company": "SARL SIGEAD Infinity-Prod",
+        "period": "Verano de 2024",
+        "description": "Prácticas de un mes en desarrollo web."
+      },
+      "freelance": {
+        "role": "Desarrollador Freelance",
+        "company": "Independiente",
+        "period": "2023 → Presente",
+        "description": "Desarrollo de aplicaciones web, móviles y de escritorio para clientes profesionales."
+      }
+    }
+  },
+  "Contact": {
+    "title": "Contacto",
+    "invite": "¿Tienes una idea de proyecto? Hablemos tomando un café virtual.",
+    "form": {
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Email",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Asunto de tu mensaje",
+      "message": "Mensaje",
+      "messagePlaceholder": "Cuéntame sobre tu proyecto...",
+      "send": "Enviar",
+      "sending": "Enviando...",
+      "successAlert": "¡Gracias! Tu mensaje ha sido enviado.",
+      "errorAlert": "Ups, algo salió mal. Inténtalo de nuevo o escríbeme directamente por email."
+    }
+  },
+  "Nav": {
+    "hero": "Inicio",
+    "about": "Sobre mí",
+    "skills": "Habilidades",
+    "projects": "Proyectos",
+    "experience": "Experiencia",
+    "contact": "Contacto"
+  },
+  "Sidebar": {
+    "themeLight": "Modo claro",
+    "themeDark": "Modo oscuro",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "collapseMenu": "Contraer menú",
+    "expandMenu": "Expandir menú"
+  },
+  "LanguageSwitcher": {
+    "label": "Idioma"
+  }
+}

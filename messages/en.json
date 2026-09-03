@@ -1,0 +1,109 @@
+{
+  "Hero": {
+    "badge": "Available for new projects",
+    "greeting": "Hi, I'm",
+    "description": "I design and build tailor-made digital solutions — websites, mobile apps, desktop apps, and complete systems — for clients who want a professional result.",
+    "ctaProjects": "View my projects",
+    "ctaContact": "Contact me"
+  },
+  "About": {
+    "title": "About",
+    "description": "Master's student in Software Engineering at USTHB Algiers, I've been building web, mobile, and desktop applications for professional clients for 2 years. Passionate about creating complete digital solutions, I work with a team of developers on real, ambitious projects.",
+    "stats": {
+      "projects": "Projects completed",
+      "experience": "Years of experience",
+      "clients": "Active clients"
+    }
+  },
+  "Skills": {
+    "title": "Skills",
+    "categories": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "mobile": "Mobile",
+      "tools": "Tools"
+    }
+  },
+  "Projects": {
+    "title": "Projects",
+    "ctaLive": "View project",
+    "ctaGithub": "GitHub",
+    "categories": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "desktop": "Desktop"
+    },
+    "items": {
+      "quickDelivery": {
+        "title": "Quick Delivery",
+        "description": "Delivery platform with real-time tracking, connecting a web and mobile app."
+      },
+      "mcaStadium": {
+        "title": "MCA Stadium",
+        "description": "Stadium entry management system using RFID technology for fast, secure access control."
+      },
+      "autoCare": {
+        "title": "AutoCare",
+        "description": "Mobile app for vehicle management: maintenance, history, and personalized reminders."
+      },
+      "ecommerce": {
+        "title": "E-Commerce",
+        "description": "Dynamic online store with product catalog, cart, and secure checkout."
+      }
+    }
+  },
+  "Experience": {
+    "title": "Experience",
+    "items": {
+      "internship": {
+        "role": "Web Developer",
+        "company": "SARL SIGEAD Infinity-Prod",
+        "period": "Summer 2024",
+        "description": "One-month internship in web development."
+      },
+      "freelance": {
+        "role": "Freelance Developer",
+        "company": "Independent",
+        "period": "2023 → Present",
+        "description": "Building web, mobile, and desktop applications for professional clients."
+      }
+    }
+  },
+  "Contact": {
+    "title": "Contact",
+    "invite": "Have a project in mind? Let's talk about it over a virtual coffee.",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Subject of your message",
+      "message": "Message",
+      "messagePlaceholder": "Tell me about your project...",
+      "send": "Send",
+      "sending": "Sending...",
+      "successAlert": "Thanks! Your message has been sent.",
+      "errorAlert": "Oops, something went wrong. Please try again or email me directly."
+    }
+  },
+  "Nav": {
+    "hero": "Home",
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "experience": "Experience",
+    "contact": "Contact"
+  },
+  "Sidebar": {
+    "themeLight": "Light mode",
+    "themeDark": "Dark mode",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "collapseMenu": "Collapse menu",
+    "expandMenu": "Expand menu"
+  },
+  "LanguageSwitcher": {
+    "label": "Language"
+  }
+}
