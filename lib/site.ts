@@ -5,9 +5,8 @@ export const SITE_URL = (
 export const OWNER_NAME = "Benlalam Mohamed Rayane";
 
 export const GITHUB_URL = "https://github.com/Rayane-62";
-// TODO: replace with the profile URL (linkedin.com/in/<slug>) once known.
 export const LINKEDIN_URL =
-  "https://www.linkedin.com/search/results/people/?keywords=Rayane%20Benlalam";
+  "https://www.linkedin.com/in/rayane-benlalam-9b606327a/";
 
 export const CV_PATH = "/cv.pdf";
 
