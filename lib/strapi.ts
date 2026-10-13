@@ -1,9 +1,24 @@
 const STRAPI_URL =
   process.env.NEXT_PUBLIC_STRAPI_URL ?? "http://localhost:1337";
 
+export type Locale = "fr" | "en" | "es" | "ar";
+
 type StrapiMedia = {
   url: string;
 } | null;
+
+function resolveLocale(
+  base: string,
+  en: string | null | undefined,
+  es: string | null | undefined,
+  ar: string | null | undefined,
+  locale: Locale
+): string {
+  if (locale === "en" && en) return en;
+  if (locale === "es" && es) return es;
+  if (locale === "ar" && ar) return ar;
+  return base;
+}
 
 export type StrapiProject = {
   id: number;
@@ -36,6 +51,47 @@ export type StrapiExperience = {
   technologies: string[] | null;
 };
 
+type RawStrapiExperience = StrapiExperience & {
+  positionEn: string | null;
+  positionEs: string | null;
+  positionAr: string | null;
+  companyEn: string | null;
+  companyEs: string | null;
+  companyAr: string | null;
+  periodEn: string | null;
+  periodEs: string | null;
+  periodAr: string | null;
+  descriptionEn: string | null;
+  descriptionEs: string | null;
+  descriptionAr: string | null;
+};
+
+export type StrapiEducation = {
+  id: number;
+  documentId: string;
+  degree: string;
+  institution: string;
+  period: string;
+  description: string | null;
+  current: boolean;
+  order: number | null;
+};
+
+type RawStrapiEducation = StrapiEducation & {
+  degreeEn: string | null;
+  degreeEs: string | null;
+  degreeAr: string | null;
+  institutionEn: string | null;
+  institutionEs: string | null;
+  institutionAr: string | null;
+  periodEn: string | null;
+  periodEs: string | null;
+  periodAr: string | null;
+  descriptionEn: string | null;
+  descriptionEs: string | null;
+  descriptionAr: string | null;
+};
+
 export type StrapiInfo = {
   id: number;
   documentId: string;
@@ -52,6 +108,16 @@ export type StrapiInfo = {
   statsProjects: number | null;
   statsExperience: number | null;
   statsClients: number | null;
+};
+
+type RawStrapiInfo = StrapiInfo & {
+  nameAr: string | null;
+  titleEn: string | null;
+  titleEs: string | null;
+  titleAr: string | null;
+  bioEn: string | null;
+  bioEs: string | null;
+  bioAr: string | null;
 };
 
 async function fetchFromStrapi<T>(path: string): Promise<T | null> {
@@ -85,23 +151,79 @@ export function getProfileUrl(baseUrl: string, value: string | null): string | n
 
 export async function getProjects(): Promise<StrapiProject[] | null> {
   const data = await fetchFromStrapi<StrapiProject[]>(
-    "/projects?populate=*&sort=order:asc"
+    "/projects?populate=*&sort=order:asc&pagination[pageSize]=100"
   );
   return data && data.length > 0 ? data : null;
 }
 
 export async function getSkills(): Promise<StrapiSkill[] | null> {
-  const data = await fetchFromStrapi<StrapiSkill[]>("/skills");
+  const data = await fetchFromStrapi<StrapiSkill[]>(
+    "/skills?pagination[pageSize]=100"
+  );
   return data && data.length > 0 ? data : null;
 }
 
-export async function getExperiences(): Promise<StrapiExperience[] | null> {
-  const data = await fetchFromStrapi<StrapiExperience[]>("/experiences");
-  return data && data.length > 0 ? data : null;
+export async function getExperiences(
+  locale: Locale = "fr"
+): Promise<StrapiExperience[] | null> {
+  const data = await fetchFromStrapi<RawStrapiExperience[]>(
+    "/experiences?pagination[pageSize]=100"
+  );
+  if (!data || data.length === 0) return null;
+  return data.map((e) => ({
+    ...e,
+    position: resolveLocale(e.position, e.positionEn, e.positionEs, e.positionAr, locale),
+    company: resolveLocale(e.company, e.companyEn, e.companyEs, e.companyAr, locale),
+    period: resolveLocale(e.period, e.periodEn, e.periodEs, e.periodAr, locale),
+    description: resolveLocale(
+      e.description,
+      e.descriptionEn,
+      e.descriptionEs,
+      e.descriptionAr,
+      locale
+    ),
+  }));
 }
 
-export async function getInfo(): Promise<StrapiInfo | null> {
-  return fetchFromStrapi<StrapiInfo>("/info?populate=*");
+export async function getEducations(
+  locale: Locale = "fr"
+): Promise<StrapiEducation[] | null> {
+  const data = await fetchFromStrapi<RawStrapiEducation[]>(
+    "/educations?sort=order:asc&pagination[pageSize]=100"
+  );
+  if (!data || data.length === 0) return null;
+  return data.map((e) => ({
+    ...e,
+    degree: resolveLocale(e.degree, e.degreeEn, e.degreeEs, e.degreeAr, locale),
+    institution: resolveLocale(
+      e.institution,
+      e.institutionEn,
+      e.institutionEs,
+      e.institutionAr,
+      locale
+    ),
+    period: resolveLocale(e.period, e.periodEn, e.periodEs, e.periodAr, locale),
+    description: e.description
+      ? resolveLocale(
+          e.description,
+          e.descriptionEn,
+          e.descriptionEs,
+          e.descriptionAr,
+          locale
+        )
+      : null,
+  }));
+}
+
+export async function getInfo(locale: Locale = "fr"): Promise<StrapiInfo | null> {
+  const raw = await fetchFromStrapi<RawStrapiInfo>("/info?populate=*");
+  if (!raw) return null;
+  return {
+    ...raw,
+    name: locale === "ar" && raw.nameAr ? raw.nameAr : raw.name,
+    title: resolveLocale(raw.title, raw.titleEn, raw.titleEs, raw.titleAr, locale),
+    bio: resolveLocale(raw.bio, raw.bioEn, raw.bioEs, raw.bioAr, locale),
+  };
 }
 
 export type ContactMessageInput = {

@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio — Benlalam Mohamed Rayane
 
-## Getting Started
+Portfolio personnel multilingue (fr, en, es, ar) construit avec Next.js 16, next-intl, Tailwind CSS 4 et Framer Motion. Le contenu est géré via Strapi, avec un contenu par défaut si le CMS est indisponible.
 
-First, run the development server:
+## Démarrage
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrir http://localhost:3000 (redirige vers `/fr`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variables d'environnement (`.env.local`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Rôle | Défaut |
+| --- | --- | --- |
+| `NEXT_PUBLIC_STRAPI_URL` | URL de l'API Strapi | `http://localhost:1337` |
+| `NEXT_PUBLIC_SITE_URL` | URL publique du site (SEO, sitemap, Open Graph) | `http://localhost:3000` |
 
-## Learn More
+## CV
 
-To learn more about Next.js, take a look at the following resources:
+Déposer le fichier dans `public/cv.pdf` : le bouton « Télécharger mon CV » apparaît automatiquement dans le Hero au prochain build.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Strapi
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Types de contenu lus : `projects`, `skills`, `experiences`, `educations`, `info` (single type) et `messages` (formulaire de contact).
+Le rôle **Public** doit avoir `find` sur les types lus et `create` sur `messages`. Si l'envoi échoue, le formulaire ouvre la messagerie du visiteur avec le message pré-rempli.
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` — serveur de développement
+- `npm run build` — build de production
+- `npm run lint` — ESLint

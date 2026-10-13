@@ -50,6 +50,14 @@ export const BriefcaseIcon = (props: SVGProps<SVGSVGElement>) => (
   </Icon>
 );
 
+export const GraduationCapIcon = (props: SVGProps<SVGSVGElement>) => (
+  <Icon {...props}>
+    <path d="m2.5 9 9.5-4.5L21.5 9 12 13.5 2.5 9Z" />
+    <path d="M6.5 11.2V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.8" />
+    <path d="M21.5 9v6" />
+  </Icon>
+);
+
 export const MailIcon = (props: SVGProps<SVGSVGElement>) => (
   <Icon {...props}>
     <rect x="3" y="5" width="18" height="14" rx="1.5" />

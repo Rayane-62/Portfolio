@@ -4,7 +4,13 @@
     "greeting": "Hi, I'm",
     "description": "I design and build tailor-made digital solutions — websites, mobile apps, desktop apps, and complete systems — for clients who want a professional result.",
     "ctaProjects": "View my projects",
-    "ctaContact": "Contact me"
+    "ctaContact": "Contact me",
+    "roles": [
+      "Full Stack Developer",
+      "Web & Mobile Developer",
+      "Software Engineer"
+    ],
+    "ctaCv": "Download my CV"
   },
   "About": {
     "title": "About",
@@ -28,6 +34,7 @@
     "title": "Projects",
     "ctaLive": "View project",
     "ctaGithub": "GitHub",
+    "inDevelopment": "In development",
     "categories": {
       "web": "Web",
       "mobile": "Mobile",
@@ -69,6 +76,23 @@
       }
     }
   },
+  "Education": {
+    "title": "Education",
+    "current": "Ongoing",
+    "items": {
+      "master": {
+        "degree": "Master's in Software Engineering",
+        "institution": "USTHB — University of Science and Technology Houari Boumediene",
+        "period": "2025 - 2027",
+        "description": "M1 completed in 2026, M2 in progress."
+      },
+      "licence": {
+        "degree": "Bachelor's in General Computer Science",
+        "institution": "USTHB — University of Science and Technology Houari Boumediene",
+        "period": "2023 - 2025"
+      }
+    }
+  },
   "Contact": {
     "title": "Contact",
     "invite": "Have a project in mind? Let's talk about it over a virtual coffee.",
@@ -84,7 +108,7 @@
       "send": "Send",
       "sending": "Sending...",
       "successAlert": "Thanks! Your message has been sent.",
-      "errorAlert": "Oops, something went wrong. Please try again or email me directly."
+      "errorAlert": "Sending failed — your email app will open with the message pre-filled."
     }
   },
   "Nav": {
@@ -93,6 +117,7 @@
     "skills": "Skills",
     "projects": "Projects",
     "experience": "Experience",
+    "education": "Education",
     "contact": "Contact"
   },
   "Sidebar": {
@@ -105,5 +130,8 @@
   },
   "LanguageSwitcher": {
     "label": "Language"
+  },
+  "Metadata": {
+    "title": "Full Stack Developer"
   }
 }

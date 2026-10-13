@@ -5,15 +5,7 @@ import { useTranslations } from "next-intl";
 import { Typewriter } from "@/components/typewriter";
 import { UserIcon } from "@/components/icons";
 import { getStrapiMediaUrl, type StrapiInfo } from "@/lib/strapi";
-
-const FALLBACK_NAME = "Benlalam Mohamed Rayane";
-
-const ROLES = [
-  "Développeur Full Stack",
-  "Web & Mobile Developer",
-  "Ingénieur Logiciel",
-  "مطور برمجيات",
-];
+import { CV_PATH, OWNER_NAME } from "@/lib/site";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
@@ -34,9 +26,16 @@ const item: Variants = {
   },
 };
 
-export function Hero({ info }: { info: StrapiInfo | null }) {
+export function Hero({
+  info,
+  hasCv,
+}: {
+  info: StrapiInfo | null;
+  hasCv: boolean;
+}) {
   const t = useTranslations("Hero");
-  const name = info?.name ?? FALLBACK_NAME;
+  const name = info?.name ?? OWNER_NAME;
+  const roles = t.raw("roles") as string[];
   const photoUrl = getStrapiMediaUrl(info?.photo ?? null);
 
   return (
@@ -71,7 +70,7 @@ export function Hero({ info }: { info: StrapiInfo | null }) {
             variants={item}
             className="text-2xl font-semibold text-[var(--text-muted)] sm:text-3xl"
           >
-            <Typewriter words={ROLES} />
+            <Typewriter words={roles} />
           </motion.h2>
 
           <motion.p
@@ -96,6 +95,16 @@ export function Hero({ info }: { info: StrapiInfo | null }) {
             >
               {t("ctaContact")}
             </a>
+            {hasCv && (
+              <a
+                href={CV_PATH}
+                download
+                data-cursor-hover
+                className="rounded-lg border border-[var(--glass-border)] bg-transparent px-6 py-3 font-medium text-[var(--text)] backdrop-blur-md transition-all hover:bg-[var(--glass-hover-bg)]"
+              >
+                {t("ctaCv")}
+              </a>
+            )}
           </motion.div>
         </motion.div>
 

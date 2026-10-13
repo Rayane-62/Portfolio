@@ -16,6 +16,7 @@ import {
   submitContactMessage,
   type StrapiInfo,
 } from "@/lib/strapi";
+import { GITHUB_URL, LINKEDIN_URL } from "@/lib/site";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const FALLBACK_EMAIL = "benlalamrayane@gmail.com";
@@ -52,13 +53,13 @@ export function Contact({ info }: { info: StrapiInfo | null }) {
   const socialLinks = [
     {
       id: "github",
-      href: getProfileUrl(GITHUB_BASE_URL, info?.github ?? null) ?? "#",
+      href: getProfileUrl(GITHUB_BASE_URL, info?.github ?? null) ?? GITHUB_URL,
       icon: GithubIcon,
       label: "GitHub",
     },
     {
       id: "linkedin",
-      href: getProfileUrl(LINKEDIN_BASE_URL, info?.linkedin ?? null) ?? "#",
+      href: getProfileUrl(LINKEDIN_BASE_URL, info?.linkedin ?? null) ?? LINKEDIN_URL,
       icon: LinkedInIcon,
       label: "LinkedIn",
     },
@@ -71,17 +72,29 @@ export function Contact({ info }: { info: StrapiInfo | null }) {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    setIsSubmitting(true);
-    const ok = await submitContactMessage({
+    const input = {
       name: String(formData.get("name") ?? ""),
       email: String(formData.get("email") ?? ""),
       subject: String(formData.get("subject") ?? ""),
       message: String(formData.get("message") ?? ""),
-    });
+    };
+
+    setIsSubmitting(true);
+    const ok = await submitContactMessage(input);
     setIsSubmitting(false);
 
-    alert(ok ? t("form.successAlert") : t("form.errorAlert"));
-    if (ok) form.reset();
+    if (ok) {
+      alert(t("form.successAlert"));
+      form.reset();
+      return;
+    }
+
+    // Strapi unreachable: hand the message over to the visitor's mail client.
+    alert(t("form.errorAlert"));
+    const body = `${input.message}\n\n— ${input.name} (${input.email})`;
+    window.location.href = `mailto:${email}?subject=${encodeURIComponent(
+      input.subject
+    )}&body=${encodeURIComponent(body)}`;
   }
 
   return (
@@ -153,6 +166,8 @@ export function Contact({ info }: { info: StrapiInfo | null }) {
                 <a
                   key={id}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   data-cursor-hover
                   className="flex items-center gap-2 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 py-2.5 text-sm text-[var(--text)] backdrop-blur-[20px] transition-colors hover:bg-[var(--glass-hover-bg)]"

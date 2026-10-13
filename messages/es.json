@@ -4,7 +4,13 @@
     "greeting": "Hola, soy",
     "description": "Diseño y desarrollo soluciones digitales a medida — sitios web, aplicaciones móviles, aplicaciones de escritorio y sistemas completos — para clientes que quieren un resultado profesional.",
     "ctaProjects": "Ver mis proyectos",
-    "ctaContact": "Contáctame"
+    "ctaContact": "Contáctame",
+    "roles": [
+      "Desarrollador Full Stack",
+      "Desarrollador Web y Móvil",
+      "Ingeniero de Software"
+    ],
+    "ctaCv": "Descargar mi CV"
   },
   "About": {
     "title": "Sobre mí",
@@ -28,6 +34,7 @@
     "title": "Proyectos",
     "ctaLive": "Ver proyecto",
     "ctaGithub": "GitHub",
+    "inDevelopment": "En desarrollo",
     "categories": {
       "web": "Web",
       "mobile": "Móvil",
@@ -69,6 +76,23 @@
       }
     }
   },
+  "Education": {
+    "title": "Formación",
+    "current": "En curso",
+    "items": {
+      "master": {
+        "degree": "Máster en Ingeniería del Software",
+        "institution": "USTHB — Universidad de Ciencia y Tecnología Houari Boumediene",
+        "period": "2025 - 2027",
+        "description": "M1 completado en 2026, M2 en curso."
+      },
+      "licence": {
+        "degree": "Licenciatura en Informática General",
+        "institution": "USTHB — Universidad de Ciencia y Tecnología Houari Boumediene",
+        "period": "2023 - 2025"
+      }
+    }
+  },
   "Contact": {
     "title": "Contacto",
     "invite": "¿Tienes una idea de proyecto? Hablemos tomando un café virtual.",
@@ -84,7 +108,7 @@
       "send": "Enviar",
       "sending": "Enviando...",
       "successAlert": "¡Gracias! Tu mensaje ha sido enviado.",
-      "errorAlert": "Ups, algo salió mal. Inténtalo de nuevo o escríbeme directamente por email."
+      "errorAlert": "El envío falló — se abrirá tu aplicación de correo con el mensaje ya escrito."
     }
   },
   "Nav": {
@@ -93,6 +117,7 @@
     "skills": "Habilidades",
     "projects": "Proyectos",
     "experience": "Experiencia",
+    "education": "Formación",
     "contact": "Contacto"
   },
   "Sidebar": {
@@ -105,5 +130,8 @@
   },
   "LanguageSwitcher": {
     "label": "Idioma"
+  },
+  "Metadata": {
+    "title": "Desarrollador Full Stack"
   }
 }

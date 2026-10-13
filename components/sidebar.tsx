@@ -12,6 +12,7 @@ import {
   LayersIcon,
   FolderIcon,
   BriefcaseIcon,
+  GraduationCapIcon,
   MailIcon,
   MenuIcon,
   XIcon,
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { id: "skills", icon: LayersIcon },
   { id: "projects", icon: FolderIcon },
   { id: "experience", icon: BriefcaseIcon },
+  { id: "education", icon: GraduationCapIcon },
   { id: "contact", icon: MailIcon },
 ];
 

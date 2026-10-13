@@ -34,7 +34,7 @@ type ProjectItem = {
   techs: string[];
   imageUrl: string | null;
   gradient: string;
-  liveHref: string;
+  liveHref: string | null;
   githubHref: string;
 };
 
@@ -88,7 +88,7 @@ export function Projects({
         techs: p.technologies ?? [],
         imageUrl: getStrapiMediaUrl(p.image),
         gradient: GRADIENTS[index % GRADIENTS.length],
-        liveHref: p.liveUrl || "#",
+        liveHref: p.liveUrl || null,
         githubHref: p.githubUrl || "#",
       }))
     : FALLBACK_PROJECTS_SOURCE.map((p, index) => ({
@@ -99,7 +99,7 @@ export function Projects({
         techs: p.techs,
         imageUrl: null,
         gradient: GRADIENTS[index % GRADIENTS.length],
-        liveHref: "#",
+        liveHref: null,
         githubHref: "#",
       }));
 
@@ -185,14 +185,20 @@ export function Projects({
                     ))}
                   </div>
 
-                  <div className="mt-auto flex flex-wrap gap-3 pt-2">
-                    <a
-                      href={liveHref}
-                      data-cursor-hover
-                      className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--bg)] transition-opacity hover:opacity-90"
-                    >
-                      {t("ctaLive")}
-                    </a>
+                  <div className="mt-auto flex flex-wrap items-center gap-3 pt-2">
+                    {liveHref ? (
+                      <a
+                        href={liveHref}
+                        data-cursor-hover
+                        className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--bg)] transition-opacity hover:opacity-90"
+                      >
+                        {t("ctaLive")}
+                      </a>
+                    ) : (
+                      <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-400">
+                        {t("inDevelopment")}
+                      </span>
+                    )}
                     <a
                       href={githubHref}
                       data-cursor-hover
