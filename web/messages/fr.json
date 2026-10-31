@@ -1,0 +1,125 @@
+{
+  "Metadata": {
+    "description": "Portfolio de BENLALAM Mohamed Rayane, développeur full stack à Alger : applications web, mobiles et desktop."
+  },
+  "Ui": {
+    "skip": "Aller au contenu",
+    "mainNav": "Navigation principale",
+    "changeLanguage": "Changer de langue",
+    "themeLight": "Passer au thème clair",
+    "themeDark": "Passer au thème sombre",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "footer": "Conçu et développé à Alger."
+  },
+  "Nav": {
+    "hero": "Accueil",
+    "about": "À propos",
+    "skills": "Compétences",
+    "experience": "Expérience",
+    "education": "Formation",
+    "projects": "Projets",
+    "contact": "Contact"
+  },
+  "Hero": {
+    "available": "Disponible pour de nouvelles missions",
+    "unavailable": "Actuellement indisponible",
+    "ctaProjects": "Voir mes projets",
+    "ctaContact": "Me contacter",
+    "ctaCv": "Télécharger mon CV",
+    "statProjects": "Projets livrés",
+    "statYears": "Ans d'expérience",
+    "statClients": "Clients",
+    "scroll": "Défiler"
+  },
+  "About": {
+    "eyebrow": "Profil",
+    "title": "À propos",
+    "extra": "Je travaille au sein d'une petite équipe de développeurs sur des produits complets : conception, développement, mise en production et suivi. Mon objectif : des applications robustes, rapides et agréables à utiliser.",
+    "factLocation": "Localisation",
+    "factLocationValue": "Alger, Algérie",
+    "factEducation": "Formation",
+    "factEducationValue": "Master Ingénierie du Logiciel — USTHB",
+    "factMode": "Collaboration",
+    "factModeValue": "Freelance · Temps plein · Remote"
+  },
+  "Skills": {
+    "eyebrow": "Stack",
+    "title": "Compétences",
+    "description": "Les outils que j'utilise au quotidien, du front au déploiement.",
+    "filterLabel": "Filtrer les compétences",
+    "categories": {
+      "all": "Tout",
+      "frontend": "Front-end",
+      "backend": "Back-end",
+      "mobile": "Mobile",
+      "tools": "Outils"
+    }
+  },
+  "Experience": {
+    "eyebrow": "Trajectoire",
+    "title": "Expérience",
+    "description": "Les missions et les postes qui ont construit ma pratique.",
+    "current": "En cours"
+  },
+  "Education": {
+    "eyebrow": "Parcours",
+    "title": "Formation",
+    "description": "Mon parcours universitaire à l'USTHB d'Alger.",
+    "current": "En cours"
+  },
+  "Projects": {
+    "eyebrow": "Réalisations",
+    "title": "Projets",
+    "description": "Applications web, mobiles et desktop conçues pour de vrais clients.",
+    "emptyTitle": "La sélection arrive",
+    "emptyText": "Je prépare la présentation de mes réalisations. Chaque projet sera publié ici avec sa stack technique, ses captures et ses liens.",
+    "emptyCta": "Parler de votre projet",
+    "ctaLive": "Voir en ligne",
+    "ctaCode": "Code"
+  },
+  "Contact": {
+    "eyebrow": "Contact",
+    "title": "Travaillons ensemble",
+    "description": "Un projet, une mission, une question ? Décrivez-moi votre besoin, je reviens vers vous avec un périmètre, un délai et un prix clairs.",
+    "directTitle": "Me joindre directement",
+    "formTitle": "Décrire votre besoin",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "whatsapp": "WhatsApp",
+    "responseTime": "Délai de réponse",
+    "responseTimeValue": "Moins de 24 h",
+    "form": {
+      "name": "Nom",
+      "namePlaceholder": "Votre nom et prénom",
+      "phone": "Téléphone",
+      "phonePlaceholder": "+213 ...",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@exemple.com",
+      "message": "Votre besoin",
+      "messagePlaceholder": "Décrivez votre projet : ce que vous voulez construire, pour qui, et pour quand.",
+      "optional": "(facultatif)",
+      "send": "Envoyer ma demande",
+      "sending": "Envoi en cours…",
+      "again": "Envoyer une autre demande",
+      "note": "Vos coordonnées ne servent qu'à vous répondre.",
+      "successTitle": "Demande envoyée",
+      "successText": "Merci ! Je vous réponds sous 24 heures.",
+      "errorTitle": "L'envoi a échoué",
+      "errors": {
+        "nameRequired": "Entrez votre nom.",
+        "nameLong": "Le nom est trop long (120 caractères maximum).",
+        "emailRequired": "Entrez votre adresse e-mail.",
+        "emailInvalid": "Cette adresse e-mail n'est pas valide.",
+        "phoneInvalid": "Ce numéro de téléphone n'est pas valide.",
+        "phoneLong": "Ce numéro est trop long (30 caractères maximum).",
+        "messageRequired": "Décrivez votre besoin.",
+        "messageShort": "Ajoutez un peu de détail ({min} caractères minimum).",
+        "messageLong": "Le message est trop long (5000 caractères maximum).",
+        "rateLimit": "Trop de demandes envoyées. Réessayez dans quelques minutes, ou écrivez-moi directement par e-mail.",
+        "invalid": "Un champ n'a pas été accepté. Vérifiez vos informations.",
+        "network": "Le serveur n'a pas répondu. Réessayez, ou écrivez-moi directement par e-mail."
+      }
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "Metadata": {
+    "description": "Portfolio of BENLALAM Mohamed Rayane, full stack developer in Algiers: web, mobile and desktop applications."
+  },
+  "Ui": {
+    "skip": "Skip to content",
+    "mainNav": "Main navigation",
+    "changeLanguage": "Change language",
+    "themeLight": "Switch to light theme",
+    "themeDark": "Switch to dark theme",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "footer": "Designed and built in Algiers."
+  },
+  "Nav": {
+    "hero": "Home",
+    "about": "About",
+    "skills": "Skills",
+    "experience": "Experience",
+    "education": "Education",
+    "projects": "Projects",
+    "contact": "Contact"
+  },
+  "Hero": {
+    "available": "Available for new projects",
+    "unavailable": "Currently unavailable",
+    "ctaProjects": "See my projects",
+    "ctaContact": "Get in touch",
+    "ctaCv": "Download my CV",
+    "statProjects": "Projects shipped",
+    "statYears": "Years of experience",
+    "statClients": "Clients",
+    "scroll": "Scroll"
+  },
+  "About": {
+    "eyebrow": "Profile",
+    "title": "About",
+    "extra": "I work inside a small team of developers on complete products: design, build, ship and maintain. The goal is always the same — software that is solid, fast and pleasant to use.",
+    "factLocation": "Location",
+    "factLocationValue": "Algiers, Algeria",
+    "factEducation": "Education",
+    "factEducationValue": "Master's in Software Engineering — USTHB",
+    "factMode": "Collaboration",
+    "factModeValue": "Freelance · Full-time · Remote"
+  },
+  "Skills": {
+    "eyebrow": "Stack",
+    "title": "Skills",
+    "description": "The tools I use every day, from the front end to deployment.",
+    "filterLabel": "Filter skills",
+    "categories": {
+      "all": "All",
+      "frontend": "Front-end",
+      "backend": "Back-end",
+      "mobile": "Mobile",
+      "tools": "Tools"
+    }
+  },
+  "Experience": {
+    "eyebrow": "Track record",
+    "title": "Experience",
+    "description": "The roles and projects that shaped the way I work.",
+    "current": "Ongoing"
+  },
+  "Education": {
+    "eyebrow": "Background",
+    "title": "Education",
+    "description": "My academic path at USTHB in Algiers.",
+    "current": "Ongoing"
+  },
+  "Projects": {
+    "eyebrow": "Work",
+    "title": "Projects",
+    "description": "Web, mobile and desktop applications built for real clients.",
+    "emptyTitle": "The selection is coming",
+    "emptyText": "I'm putting together the write-ups of my work. Each project will be published here with its tech stack, screenshots and links.",
+    "emptyCta": "Tell me about your project",
+    "ctaLive": "View live",
+    "ctaCode": "Code"
+  },
+  "Contact": {
+    "eyebrow": "Contact",
+    "title": "Let's work together",
+    "description": "A project, a mission, a question? Describe what you need and I'll come back with a clear scope, timeline and price.",
+    "directTitle": "Reach me directly",
+    "formTitle": "Describe your project",
+    "email": "Email",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp",
+    "responseTime": "Response time",
+    "responseTimeValue": "Under 24 h",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Your first and last name",
+      "phone": "Phone",
+      "phonePlaceholder": "+213 ...",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "message": "What you need",
+      "messagePlaceholder": "Describe your project: what you want to build, who for, and by when.",
+      "optional": "(optional)",
+      "send": "Send my request",
+      "sending": "Sending…",
+      "again": "Send another request",
+      "note": "Your details are only used to reply to you.",
+      "successTitle": "Request sent",
+      "successText": "Thank you! I'll get back to you within 24 hours.",
+      "errorTitle": "Sending failed",
+      "errors": {
+        "nameRequired": "Enter your name.",
+        "nameLong": "That name is too long (120 characters maximum).",
+        "emailRequired": "Enter your email address.",
+        "emailInvalid": "That email address isn't valid.",
+        "phoneInvalid": "That phone number isn't valid.",
+        "phoneLong": "That number is too long (30 characters maximum).",
+        "messageRequired": "Describe what you need.",
+        "messageShort": "Add a little more detail ({min} characters minimum).",
+        "messageLong": "The message is too long (5000 characters maximum).",
+        "rateLimit": "Too many requests sent. Try again in a few minutes, or email me directly.",
+        "invalid": "One of the fields wasn't accepted. Please check your details.",
+        "network": "The server didn't respond. Try again, or email me directly."
+      }
+    }
+  }
+}
