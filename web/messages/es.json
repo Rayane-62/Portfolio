@@ -109,7 +109,16 @@
     "zoom": "Ampliar la captura",
     "unzoom": "Reducir la captura",
     "position": "{n} de {total}",
-    "noShots": "Las capturas de este proyecto llegarán pronto."
+    "noShots": "Las capturas de este proyecto llegarán pronto.",
+    "subprojects": "Subproyectos",
+    "subCount": "{count, plural, one {# subproyecto} other {# subproyectos}}",
+    "openSub": "Ver el detalle",
+    "platforms": {
+      "web": "Web",
+      "android": "Android",
+      "ios": "iOS",
+      "desktop": "Escritorio"
+    }
   },
   "Contact": {
     "eyebrow": "Contacto",

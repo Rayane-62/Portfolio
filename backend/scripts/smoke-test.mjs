@@ -345,6 +345,20 @@ async function main() {
   check('site : seules les parties avec photos ont un onglet', pubGal.sections.length === 1 && pubGal.sections[0].images.length === 3, pubGal.sections);
   check('site : toutes les parties sont listées, traduites', pubGal.parts.map((x) => x.title).join() === 'App livreurs,Admin website', pubGal.parts);
   check('site : couverture = image choisie', pubGal.coverUrl === img.data.url);
+  console.log('\nSous-projets');
+  check('plateforme inconnue refusée (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { platforms: ['tv'] })).status === 400);
+  const sub = await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, {
+    description: 'Back-office complet.', features: '- Validation des livreurs\n- Statistiques', platforms: ['web'],
+    technologies: ['React', 'Vite'], liveUrl: 'https://admin.example.com',
+  });
+  check('sous-projet enregistré', sub.status === 200 && sub.data.find((x) => x.id === s1.id).platforms.join() === 'web', sub.data);
+  check('lien du sous-projet sans https refusé (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { liveUrl: 'admin.example.com' })).status === 400);
+  await call('PATCH', `/admin/projects/${proj.data.id}`, { hasSubprojects: true });
+  const pubSub = (await call('GET', '/public/portfolio?locale=fr', null, false)).data.projects.find((p) => p.id === proj.data.id);
+  const s1Pub = pubSub.sections.find((x) => x.id === s1.id);
+  check('site : avec sous-projets, toutes les parties sont affichées (même sans photo)', pubSub.hasSubprojects === true && pubSub.sections.length === 2, pubSub.sections.map((x) => x.title));
+  check('site : détail du sous-projet', s1Pub?.description === 'Back-office complet.' && JSON.stringify(s1Pub.features) === '["Validation des livreurs","Statistiques"]' && s1Pub.technologies.length === 2 && s1Pub.liveUrl === 'https://admin.example.com', s1Pub);
+  await call('PATCH', `/admin/projects/${proj.data.id}`, { hasSubprojects: false });
   const delImg = await call('DELETE', `/admin/projects/${proj.data.id}/images/${imgs[0].id}`);
   check('supprimer une photo (fichier compris)', delImg.status === 200 && (await fetch(shots[0].url)).status === 404);
   check('photo d\'un autre projet refusée (404)', (await call('DELETE', `/admin/projects/${proj2.data.id}/images/${imgs[1].id}`)).status === 404);

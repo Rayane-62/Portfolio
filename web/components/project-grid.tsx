@@ -54,7 +54,11 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
                 {(p.parts.length > 1 || shots > 0) && (
                   <p className="meta">
                     {[
-                      p.parts.length > 1 ? t("partsCount", { count: p.parts.length }) : null,
+                      p.hasSubprojects && p.sections.length > 0
+                        ? t("subCount", { count: p.sections.length })
+                        : p.parts.length > 1
+                          ? t("partsCount", { count: p.parts.length })
+                          : null,
                       shots > 0 ? t("shots", { count: shots }) : null,
                     ]
                       .filter(Boolean)

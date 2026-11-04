@@ -97,17 +97,25 @@ export class PortfolioService {
           status: p.status,
           context: p.context,
           team: p.team,
+          hasSubprojects: p.hasSubprojects,
           technologies: p.technologies,
           coverUrl: coverOf(p.imageUrl, p.sections),
           liveUrl: p.liveUrl,
           githubUrl: p.githubUrl,
           featured: p.featured,
+          // Galerie simple : seules les parties avec photos ont un onglet. Sous-projets : tous sont affichés.
           sections: p.sections
-            .filter((s) => s.images.length)
+            .filter((s) => p.hasSubprojects || s.images.length)
             .map((s) => ({
               id: s.id,
               title: tr(s, 'title', locale),
               subtitle: tr(s, 'subtitle', locale),
+              description: tr(s, 'description', locale),
+              features: lines(tr(s, 'features', locale)),
+              platforms: s.platforms,
+              technologies: s.technologies,
+              liveUrl: s.liveUrl,
+              githubUrl: s.githubUrl,
               images: s.images.map((img) => ({ id: img.id, url: img.url, width: img.width, height: img.height })),
             })),
           // Les parties sans photo restent listées dans « Parties du projet ».

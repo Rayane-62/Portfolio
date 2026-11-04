@@ -1,4 +1,4 @@
-import type { Locale, ProjectCategory, ProjectContext, ProjectStatus, SkillCategory, SocialKey } from './types';
+import type { Locale, Platform, ProjectCategory, ProjectContext, ProjectStatus, SkillCategory, SocialKey } from './types';
 
 export function plural(n: number, one: string, many: string) {
   return `${n} ${n > 1 ? many : one}`;
@@ -79,6 +79,9 @@ export const PROJECT_CONTEXT: Record<ProjectContext, string> = {
   internship: 'Stage',
 };
 export const CONTEXT_ORDER: ProjectContext[] = ['client', 'personal', 'academic', 'internship'];
+
+export const PLATFORM_LABELS: Record<Platform, string> = { web: 'Web', android: 'Android', ios: 'iOS', desktop: 'Desktop' };
+export const PLATFORM_ORDER: Platform[] = ['web', 'android', 'ios', 'desktop'];
 
 // ─── Réseaux sociaux (tous facultatifs) ─────────────────────────────────────
 

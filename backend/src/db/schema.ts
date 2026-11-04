@@ -24,6 +24,10 @@ export const projectContext = pgEnum('project_context', ['client', 'personal', '
  * est remplacée par le français côté API, le site n'a jamais de trou.
  */
 export const LOCALES = ['fr', 'en', 'es', 'ar'] as const;
+
+/** Plateformes d'un sous-projet. */
+export const PLATFORMS = ['web', 'android', 'ios', 'desktop'] as const;
+export type Platform = (typeof PLATFORMS)[number];
 export type Locale = (typeof LOCALES)[number];
 
 // ─── Administrateur (un seul compte) ────────────────────────────────────────
@@ -226,6 +230,8 @@ export const projects = pgTable(
     context: projectContext('context'),
     /** true = badge « Projet en équipe ». */
     team: boolean('team').notNull().default(false),
+    /** true = les parties sont des sous-projets complets (Quick : app livreur, web partenaire…). */
+    hasSubprojects: boolean('has_subprojects').notNull().default(false),
     technologies: jsonb('technologies').$type<string[]>().notNull().default([]),
 
     /** Image de couverture. NULL = la 1re photo de la galerie. */
@@ -266,6 +272,23 @@ export const projectSections = pgTable(
     subtitleEn: varchar('subtitle_en', { length: 200 }),
     subtitleEs: varchar('subtitle_es', { length: 200 }),
     subtitleAr: varchar('subtitle_ar', { length: 200 }),
+
+    // Champs utilisés quand le projet a des sous-projets (hasSubprojects).
+    description: text('description'),
+    descriptionEn: text('description_en'),
+    descriptionEs: text('description_es'),
+    descriptionAr: text('description_ar'),
+    /** Une fonctionnalité par ligne. */
+    features: text('features').notNull().default(''),
+    featuresEn: text('features_en'),
+    featuresEs: text('features_es'),
+    featuresAr: text('features_ar'),
+    /** ['web', 'android', 'ios', 'desktop'] */
+    platforms: jsonb('platforms').$type<Platform[]>().notNull().default([]),
+    technologies: jsonb('technologies').$type<string[]>().notNull().default([]),
+    liveUrl: text('live_url'),
+    githubUrl: text('github_url'),
+
     order: integer('order').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

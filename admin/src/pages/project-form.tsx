@@ -28,6 +28,7 @@ interface FormState {
   /** 'none' = non précisé (null dans l'API). */
   context: ProjectContext | 'none';
   team: boolean;
+  hasSubprojects: boolean;
   technologies: string[];
   imageUrl: string | null;
   imagePublicId: string | null;
@@ -43,6 +44,7 @@ const empty = (): FormState => ({
   status: 'completed',
   context: 'none',
   team: false,
+  hasSubprojects: false,
   technologies: [],
   imageUrl: null,
   imagePublicId: null,
@@ -60,6 +62,7 @@ const fromProject = (p: Project): FormState => ({
   status: p.status,
   context: p.context ?? 'none',
   team: p.team,
+  hasSubprojects: p.hasSubprojects,
   technologies: p.technologies,
   imageUrl: p.imageUrl,
   imagePublicId: p.imagePublicId,
@@ -150,6 +153,7 @@ function ProjectForm({ project }: { project: Project | null }) {
         status: f.status,
         context: f.context === 'none' ? null : f.context,
         team: f.team,
+        hasSubprojects: f.hasSubprojects,
         technologies: f.technologies,
         imageUrl: f.imageUrl,
         imagePublicId: f.imagePublicId,
@@ -278,6 +282,12 @@ function ProjectForm({ project }: { project: Project | null }) {
               />
             </Field>
             <SwitchRow label="Projet en équipe" hint="Ajoute le badge « Projet en équipe » sur la carte." checked={f.team} onChange={(v) => set('team', v)} />
+            <SwitchRow
+              label="Ce projet a des sous-projets"
+              hint="Ex. Quick : app livreur, app client, web partenaire… Chaque sous-projet a sa description, ses plateformes, ses technologies et ses photos. Pense à enregistrer le projet après l'avoir changé."
+              checked={f.hasSubprojects}
+              onChange={(v) => set('hasSubprojects', v)}
+            />
             <Field label="Technologies" as="div">
               <TechInput value={f.technologies} onChange={(v) => set('technologies', v)} suggestions={TECH_SUGGESTIONS} />
             </Field>
@@ -312,11 +322,11 @@ function ProjectForm({ project }: { project: Project | null }) {
 
           <section className="panel flex flex-col gap-[18px]">
             <h2 className="panel-title m-0!">
-              Galerie
-              <span className="label">Langue des noms : {loc.toUpperCase()}</span>
+              {f.hasSubprojects ? 'Sous-projets' : 'Galerie'}
+              <span className="label">Langue des textes : {loc.toUpperCase()}</span>
             </h2>
             {project ? (
-              <ProjectGallery projectId={project.id} loc={loc} coverChosen={!!f.imageUrl} />
+              <ProjectGallery projectId={project.id} loc={loc} coverChosen={!!f.imageUrl} sub={f.hasSubprojects} />
             ) : (
               <p className="note m-0">Ajoute d'abord le projet : la galerie (parties et photos) se remplit ensuite, depuis cette page.</p>
             )}

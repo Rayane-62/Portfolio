@@ -1,16 +1,25 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { type DragEvent, useRef, useState } from 'react';
 import { IconClose, IconImage, IconPlus, IconStar } from '@/components/icons';
-import { Button, DeleteButton, ErrorText, LoadError, Loading, OrderButtons, Spinner, TransField } from '@/components/ui';
+import { Button, DeleteButton, ErrorText, Field, LoadError, Loading, OrderButtons, Spinner, TechInput, TransField } from '@/components/ui';
 import { api, errMsg, upload } from '@/lib/api';
-import { LOCALES, locField, plural } from '@/lib/format';
+import { LOCALES, locField, PLATFORM_LABELS, PLATFORM_ORDER, plural } from '@/lib/format';
 import { keys, queryClient, refresh } from '@/lib/queries';
-import type { Locale, ProjectImage, ProjectSection } from '@/lib/types';
+import type { Locale, Platform, ProjectImage, ProjectSection } from '@/lib/types';
 import { confirm, toast } from '@/store/ui';
 
 const MAX_IMAGE_MB = 15;
-const SECTION_FIELDS = ['title', 'subtitle'] as const;
+const SECTION_FIELDS = ['title', 'subtitle', 'description', 'features'] as const;
 type SectionTexts = Record<(typeof SECTION_FIELDS)[number], Record<Locale, string>>;
+
+/** Tout ce qui se modifie dans une partie / un sous-projet (hors photos). */
+interface SectionForm {
+  texts: SectionTexts;
+  platforms: Platform[];
+  technologies: string[];
+  liveUrl: string;
+  githubUrl: string;
+}
 
 const sectionsKey = (projectId: number) => [...keys.projects, 'sections', projectId] as const;
 
@@ -25,7 +34,7 @@ function moved<T extends { id: number }>(list: T[], i: number, d: -1 | 1) {
  * Les parties d'un projet et leurs photos. Chaque action est enregistrée tout de suite
  * (pas besoin du bouton « Enregistrer » du projet) ; l'API renvoie la liste à jour.
  */
-export function ProjectGallery({ projectId, loc, coverChosen }: { projectId: number; loc: Locale; coverChosen: boolean }) {
+export function ProjectGallery({ projectId, loc, coverChosen, sub }: { projectId: number; loc: Locale; coverChosen: boolean; sub: boolean }) {
   const q = useQuery({
     queryKey: sectionsKey(projectId),
     queryFn: () => api<ProjectSection[]>(`/admin/projects/${projectId}/sections`),
@@ -57,7 +66,9 @@ export function ProjectGallery({ projectId, loc, coverChosen }: { projectId: num
   return (
     <div className="flex flex-col gap-3.5">
       <p className="note m-0">
-        Une partie = un onglet de la fenêtre du projet sur le site (ex. « Site admin », « App clients », « App livreurs »).
+        {sub
+          ? 'Chaque sous-projet devient une carte dans la fenêtre du projet : un clic ouvre sa description, ses plateformes, ses technologies et ses photos.'
+          : 'Une partie = un onglet de la fenêtre du projet sur le site (ex. « Site admin », « App clients », « App livreurs »).'}
         {total > 0 && <> {plural(sections.length, 'partie', 'parties')} · {plural(total, 'photo', 'photos')}.</>}
         {!coverChosen && firstImage && <> La 1<sup>re</sup> photo sert de couverture tant qu'aucune n'est choisie plus haut.</>}
       </p>
@@ -71,6 +82,7 @@ export function ProjectGallery({ projectId, loc, coverChosen }: { projectId: num
           index={i}
           count={sections.length}
           isCover={!coverChosen && firstImage?.sectionId === s.id}
+          sub={sub}
           busy={reorder.isPending}
           onMove={(d) => reorder.mutate(moved(sections, i, d))}
           onChange={apply}
@@ -87,23 +99,29 @@ export function ProjectGallery({ projectId, loc, coverChosen }: { projectId: num
         }}
       >
         <label className="flex min-w-[220px] flex-1 flex-col gap-1.5">
-          <span className="label">Nouvelle partie</span>
-          <input className="input" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} maxLength={120} placeholder={sections.length ? 'App livreurs' : 'Site admin'} />
+          <span className="label">{sub ? 'Nouveau sous-projet' : 'Nouvelle partie'}</span>
+          <input className="input" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} maxLength={120} placeholder={sections.length ? 'App livreur' : 'Web admin'} />
         </label>
-        <Button type="submit" variant="ghost" loading={create.isPending}><IconPlus size={16} /> Ajouter la partie</Button>
+        <Button type="submit" variant="ghost" loading={create.isPending}><IconPlus size={16} /> {sub ? 'Ajouter le sous-projet' : 'Ajouter la partie'}</Button>
       </form>
     </div>
   );
 }
 
-function textsOf(s: ProjectSection): SectionTexts {
-  return Object.fromEntries(
-    SECTION_FIELDS.map((f) => [f, Object.fromEntries(LOCALES.map((l) => [l, (s as unknown as Record<string, string | null>)[locField(f, l)] ?? '']))]),
-  ) as SectionTexts;
+function formOf(s: ProjectSection): SectionForm {
+  return {
+    texts: Object.fromEntries(
+      SECTION_FIELDS.map((f) => [f, Object.fromEntries(LOCALES.map((l) => [l, (s as unknown as Record<string, string | null>)[locField(f, l)] ?? '']))]),
+    ) as SectionTexts,
+    platforms: s.platforms ?? [],
+    technologies: s.technologies ?? [],
+    liveUrl: s.liveUrl ?? '',
+    githubUrl: s.githubUrl ?? '',
+  };
 }
 
 function SectionCard({
-  projectId, section, loc, index, count, isCover, busy, onMove, onChange,
+  projectId, section, loc, index, count, isCover, sub, busy, onMove, onChange,
 }: {
   projectId: number;
   section: ProjectSection;
@@ -111,31 +129,42 @@ function SectionCard({
   index: number;
   count: number;
   isCover: boolean;
+  sub: boolean;
   busy: boolean;
   onMove: (d: -1 | 1) => void;
   onChange: (s: ProjectSection[]) => void;
 }) {
   const base = `/admin/projects/${projectId}`;
-  const [texts, setTexts] = useState(() => textsOf(section));
-  const [saved, setSaved] = useState(() => JSON.stringify(textsOf(section)));
+  const [form, setForm] = useState(() => formOf(section));
+  const [saved, setSaved] = useState(() => JSON.stringify(formOf(section)));
+  const texts = form.texts;
   const [error, setError] = useState('');
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [over, setOver] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  const dirty = JSON.stringify(texts) !== saved;
+  const dirty = JSON.stringify(form) !== saved;
 
   const setText = (field: keyof SectionTexts) => (l: Locale, v: string) => {
-    setTexts((t) => ({ ...t, [field]: { ...t[field], [l]: v } }));
+    setForm((f) => ({ ...f, texts: { ...f.texts, [field]: { ...f.texts[field], [l]: v } } }));
+    setError('');
+  };
+  const setField = <K extends keyof SectionForm>(k: K, v: SectionForm[K]) => {
+    setForm((f) => ({ ...f, [k]: v }));
     setError('');
   };
 
   const save = useMutation({
     mutationFn: () => {
-      const json: Record<string, string> = {};
+      const json: Record<string, unknown> = {
+        platforms: PLATFORM_ORDER.filter((p) => form.platforms.includes(p)),
+        technologies: form.technologies,
+        liveUrl: form.liveUrl.trim(),
+        githubUrl: form.githubUrl.trim(),
+      };
       for (const f of SECTION_FIELDS) for (const l of LOCALES) json[locField(f, l)] = texts[f][l].trim();
       return api<ProjectSection[]>(`${base}/sections/${section.id}`, { method: 'PATCH', json });
     },
-    onSuccess: (s) => { onChange(s); setSaved(JSON.stringify(texts)); toast('Partie enregistrée'); },
+    onSuccess: (s) => { onChange(s); setSaved(JSON.stringify(form)); toast(sub ? 'Sous-projet enregistré' : 'Partie enregistrée'); },
     onError: (e) => setError(errMsg(e)),
   });
   const removeSection = useMutation({
@@ -224,13 +253,54 @@ function SectionCard({
       </div>
 
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-        <TransField label="Nom de la partie" loc={loc} values={texts.title} onChange={setText('title')} maxLength={120} placeholder="Site admin" />
-        <TransField label="Sous-titre" loc={loc} values={texts.subtitle} onChange={setText('subtitle')} maxLength={200} placeholder="Web · Android · iOS" />
+        <TransField label={sub ? 'Nom du sous-projet' : 'Nom de la partie'} loc={loc} values={texts.title} onChange={setText('title')} maxLength={120} placeholder={sub ? 'App livreur' : 'Site admin'} />
+        <TransField label="Sous-titre" loc={loc} values={texts.subtitle} onChange={setText('subtitle')} maxLength={200} placeholder={sub ? 'Pour les livreurs indépendants' : 'Web · Android · iOS'} />
       </div>
+      {sub && (
+        <div className="mt-3 flex flex-col gap-3">
+          <Field label="Plateformes" as="div">
+            <div className="seg" role="group" aria-label="Plateformes du sous-projet">
+              {PLATFORM_ORDER.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  aria-pressed={form.platforms.includes(p)}
+                  onClick={() => setField('platforms', form.platforms.includes(p) ? form.platforms.filter((x) => x !== p) : [...form.platforms, p])}
+                >
+                  {PLATFORM_LABELS[p]}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <TransField label="Description" loc={loc} values={texts.description} onChange={setText('description')} maxLength={6000} rows={4} placeholder="Ce que fait ce sous-projet, pour qui." />
+          <TransField label="Fonctionnalités" loc={loc} values={texts.features} onChange={setText('features')} maxLength={4000} rows={4} placeholder={'Suivi des courses en temps réel\nHistorique des gains'} hint="Une par ligne." />
+          <Field label="Technologies" as="div">
+            <TechInput value={form.technologies} onChange={(v) => setField('technologies', v)} suggestions={['React Native', 'Expo', 'Next.js', 'React', 'Vite', 'NestJS']} />
+          </Field>
+          <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
+            <Field label="Lien en ligne">
+              <input className="input" value={form.liveUrl} onChange={(e) => setField('liveUrl', e.target.value)} placeholder="https://…" inputMode="url" maxLength={1000} />
+            </Field>
+            <Field label="Dépôt GitHub">
+              <input className="input" value={form.githubUrl} onChange={(e) => setField('githubUrl', e.target.value)} placeholder="https://github.com/…" inputMode="url" maxLength={1000} />
+            </Field>
+          </div>
+        </div>
+      )}
       {dirty && (
         <div className="mt-2.5 flex gap-2">
-          <Button size="sm" loading={save.isPending} onClick={() => { if (!texts.title.fr.trim()) return setError('Le nom (en français) est obligatoire.'); save.mutate(); }}>Enregistrer la partie</Button>
-          <Button size="sm" variant="ghost" onClick={() => { setTexts(JSON.parse(saved)); setError(''); }}>Annuler</Button>
+          <Button
+            size="sm"
+            loading={save.isPending}
+            onClick={() => {
+              if (!texts.title.fr.trim()) return setError('Le nom (en français) est obligatoire.');
+              for (const v of [form.liveUrl, form.githubUrl]) if (v.trim() && !/^https?:\/\//.test(v.trim())) return setError('Les liens doivent commencer par https://');
+              save.mutate();
+            }}
+          >
+            {sub ? 'Enregistrer le sous-projet' : 'Enregistrer la partie'}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => { setForm(JSON.parse(saved)); setError(''); }}>Annuler</Button>
         </div>
       )}
       <ErrorText>{error}</ErrorText>

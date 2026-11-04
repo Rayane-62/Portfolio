@@ -14,13 +14,16 @@ const FIELDS = [
   'description', 'descriptionEn', 'descriptionEs', 'descriptionAr',
   'features', 'featuresEn', 'featuresEs', 'featuresAr',
   'highlights', 'highlightsEn', 'highlightsEs', 'highlightsAr',
-  'categories', 'status', 'context', 'team',
+  'categories', 'status', 'context', 'team', 'hasSubprojects',
   'technologies', 'imageUrl', 'imagePublicId', 'liveUrl', 'githubUrl', 'featured', 'visible',
 ] as const;
 
 const SECTION_FIELDS = [
   'title', 'titleEn', 'titleEs', 'titleAr',
   'subtitle', 'subtitleEn', 'subtitleEs', 'subtitleAr',
+  'description', 'descriptionEn', 'descriptionEs', 'descriptionAr',
+  'features', 'featuresEn', 'featuresEs', 'featuresAr',
+  'platforms', 'technologies', 'liveUrl', 'githubUrl',
 ] as const;
 
 export type SectionWithImages = ProjectSection & { images: ProjectImage[] };

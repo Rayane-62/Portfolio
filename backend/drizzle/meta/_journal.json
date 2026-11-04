@@ -22,6 +22,13 @@
       "when": 1793790894905,
       "tag": "0002_drop_single_category",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793802080131,
+      "tag": "0003_subprojects",
+      "breakpoints": true
     }
   ]
 }

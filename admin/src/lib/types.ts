@@ -5,6 +5,7 @@ export type SkillCategory = 'frontend' | 'backend' | 'mobile' | 'tools';
 export type ProjectCategory = 'web' | 'mobile' | 'desktop';
 export type ProjectStatus = 'live' | 'completed' | 'coming_soon' | 'in_progress';
 export type ProjectContext = 'client' | 'personal' | 'academic' | 'internship';
+export type Platform = 'web' | 'android' | 'ios' | 'desktop';
 export type SocialKey = 'github' | 'linkedin' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'behance' | 'dribbble';
 
 export interface Me {
@@ -146,6 +147,8 @@ export interface Project {
   /** null = non précisé. */
   context: ProjectContext | null;
   team: boolean;
+  /** true = les parties sont des sous-projets complets. */
+  hasSubprojects: boolean;
   technologies: string[];
   /** Couverture choisie. null = la 1re photo de la galerie. */
   imageUrl: string | null;
@@ -192,6 +195,19 @@ export interface ProjectSection {
   subtitleEn: string | null;
   subtitleEs: string | null;
   subtitleAr: string | null;
+  /** Champs des sous-projets. */
+  description: string | null;
+  descriptionEn: string | null;
+  descriptionEs: string | null;
+  descriptionAr: string | null;
+  features: string;
+  featuresEn: string | null;
+  featuresEs: string | null;
+  featuresAr: string | null;
+  platforms: Platform[];
+  technologies: string[];
+  liveUrl: string | null;
+  githubUrl: string | null;
   order: number;
   images: ProjectImage[];
 }

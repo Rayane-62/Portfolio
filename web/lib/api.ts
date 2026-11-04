@@ -76,6 +76,7 @@ export type Education = {
 export type ProjectCategory = "web" | "mobile" | "desktop";
 export type ProjectStatus = "live" | "completed" | "coming_soon" | "in_progress";
 export type ProjectContext = "client" | "personal" | "academic" | "internship";
+export type Platform = "web" | "android" | "ios" | "desktop";
 
 export type ProjectImage = {
   id: number;
@@ -84,11 +85,20 @@ export type ProjectImage = {
   height: number;
 };
 
-/** Un onglet de la fenêtre du projet : une partie qui a des photos. */
+/**
+ * Galerie simple : un onglet (une partie qui a des photos).
+ * Projet avec sous-projets : un sous-projet complet.
+ */
 export type ProjectSection = {
   id: number;
   title: string;
   subtitle: string | null;
+  description: string | null;
+  features: string[];
+  platforms: Platform[];
+  technologies: string[];
+  liveUrl: string | null;
+  githubUrl: string | null;
   images: ProjectImage[];
 };
 
@@ -104,6 +114,7 @@ export type Project = {
   status: ProjectStatus;
   context: ProjectContext | null;
   team: boolean;
+  hasSubprojects: boolean;
   technologies: string[];
   /** Couverture : image choisie ou 1re photo de la galerie. */
   coverUrl: string | null;
@@ -190,7 +201,16 @@ function normalize(raw: unknown, locale: Locale): Portfolio {
           highlights: Array.isArray(p.highlights) ? p.highlights : [],
           categories: Array.isArray(p.categories) ? p.categories : [],
           technologies: Array.isArray(p.technologies) ? p.technologies : [],
-          sections: Array.isArray(p.sections) ? p.sections : [],
+          hasSubprojects: !!p.hasSubprojects,
+          sections: Array.isArray(p.sections)
+            ? p.sections.map((s) => ({
+                ...s,
+                features: Array.isArray(s.features) ? s.features : [],
+                platforms: Array.isArray(s.platforms) ? s.platforms : [],
+                technologies: Array.isArray(s.technologies) ? s.technologies : [],
+                images: Array.isArray(s.images) ? s.images : [],
+              }))
+            : [],
           parts: Array.isArray(p.parts) ? p.parts : [],
           status: p.status ?? "completed",
         }))

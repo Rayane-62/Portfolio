@@ -109,7 +109,16 @@
     "zoom": "Enlarge screenshot",
     "unzoom": "Shrink screenshot",
     "position": "{n} of {total}",
-    "noShots": "Screenshots for this project are coming soon."
+    "noShots": "Screenshots for this project are coming soon.",
+    "subprojects": "Sub-projects",
+    "subCount": "{count, plural, one {# sub-project} other {# sub-projects}}",
+    "openSub": "View details",
+    "platforms": {
+      "web": "Web",
+      "android": "Android",
+      "ios": "iOS",
+      "desktop": "Desktop"
+    }
   },
   "Contact": {
     "eyebrow": "Contact",

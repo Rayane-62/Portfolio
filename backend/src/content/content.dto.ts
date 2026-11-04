@@ -23,6 +23,8 @@ import {
   ProjectContext,
   projectStatus,
   ProjectStatus,
+  PLATFORMS,
+  type Platform,
   skillCategory,
   SkillCategory,
 } from '../db/schema';
@@ -287,6 +289,11 @@ export class CreateProjectDto {
   @IsBoolean()
   team?: boolean;
 
+  /** true = les parties sont des sous-projets complets. */
+  @IsOptional()
+  @IsBoolean()
+  hasSubprojects?: boolean;
+
   @Technologies() technologies?: string[];
 
   @Lien('Image invalide') imageUrl?: string | null;
@@ -336,6 +343,42 @@ export class CreateSectionDto {
   @Traduction(200) subtitleEn?: string | null;
   @Traduction(200) subtitleEs?: string | null;
   @Traduction(200) subtitleAr?: string | null;
+
+  // ─── Sous-projet (projet avec sous-projets) ───
+
+  @IsOptional()
+  @Transform(emptyToNull)
+  @ValidateIf((_, v) => v !== null)
+  @IsString()
+  @MaxLength(6000)
+  description?: string | null;
+
+  @Traduction(6000) descriptionEn?: string | null;
+  @Traduction(6000) descriptionEs?: string | null;
+  @Traduction(6000) descriptionAr?: string | null;
+
+  /** Une fonctionnalité par ligne. */
+  @IsOptional()
+  @Transform(trimKeepLines)
+  @IsString()
+  @MaxLength(4000)
+  features?: string;
+
+  @Traduction(4000) featuresEn?: string | null;
+  @Traduction(4000) featuresEs?: string | null;
+  @Traduction(4000) featuresAr?: string | null;
+
+  /** ['web', 'android', 'ios', 'desktop'] */
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsIn(PLATFORMS, { each: true, message: 'Plateforme inconnue : web, android, ios ou desktop' })
+  platforms?: Platform[];
+
+  @Technologies() technologies?: string[];
+
+  @Lien('Le lien du sous-projet doit commencer par https://') liveUrl?: string | null;
+  @Lien('Le lien GitHub doit commencer par https://') githubUrl?: string | null;
 }
 
 export class UpdateSectionDto extends PartialType(CreateSectionDto) {}
