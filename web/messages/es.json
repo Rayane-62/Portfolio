@@ -1,0 +1,158 @@
+{
+  "Metadata": {
+    "description": "Portfolio de BENLALAM Mohamed Rayane, desarrollador full stack en Argel: aplicaciones web, móviles y de escritorio."
+  },
+  "Ui": {
+    "skip": "Ir al contenido",
+    "mainNav": "Navegación principal",
+    "changeLanguage": "Cambiar de idioma",
+    "themeLight": "Cambiar al tema claro",
+    "themeDark": "Cambiar al tema oscuro",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú",
+    "footer": "Diseñado y desarrollado en Argel."
+  },
+  "Nav": {
+    "hero": "Inicio",
+    "about": "Perfil",
+    "skills": "Habilidades",
+    "experience": "Experiencia",
+    "education": "Formación",
+    "projects": "Proyectos",
+    "contact": "Contacto"
+  },
+  "Hero": {
+    "available": "Disponible para nuevos proyectos",
+    "unavailable": "No disponible actualmente",
+    "ctaProjects": "Ver mis proyectos",
+    "ctaContact": "Contactarme",
+    "ctaCv": "Descargar mi CV",
+    "statProjects": "Proyectos entregados",
+    "statYears": "Años de experiencia",
+    "statClients": "Clientes",
+    "scroll": "Desliza"
+  },
+  "About": {
+    "eyebrow": "Perfil",
+    "title": "Sobre mí",
+    "extra": "Trabajo en un equipo pequeño de desarrolladores en productos completos: diseño, desarrollo, puesta en producción y mantenimiento. El objetivo: aplicaciones sólidas, rápidas y agradables de usar.",
+    "factLocation": "Ubicación",
+    "factLocationValue": "Argel, Argelia",
+    "factEducation": "Formación",
+    "factEducationValue": "Máster en Ingeniería del Software — USTHB",
+    "factMode": "Colaboración",
+    "factModeValue": "Freelance · Jornada completa · Remoto"
+  },
+  "Skills": {
+    "eyebrow": "Stack",
+    "title": "Habilidades",
+    "description": "Las herramientas que uso a diario, del front al despliegue.",
+    "filterLabel": "Filtrar habilidades",
+    "categories": {
+      "all": "Todo",
+      "frontend": "Front-end",
+      "backend": "Back-end",
+      "mobile": "Móvil",
+      "tools": "Herramientas"
+    }
+  },
+  "Experience": {
+    "eyebrow": "Trayectoria",
+    "title": "Experiencia",
+    "description": "Los puestos y encargos que han formado mi manera de trabajar.",
+    "current": "En curso"
+  },
+  "Education": {
+    "eyebrow": "Recorrido",
+    "title": "Formación",
+    "description": "Mi recorrido universitario en la USTHB de Argel.",
+    "current": "En curso"
+  },
+  "Projects": {
+    "eyebrow": "Trabajos",
+    "title": "Proyectos",
+    "description": "Aplicaciones web, móviles y de escritorio creadas para clientes reales.",
+    "emptyTitle": "La selección está en camino",
+    "emptyText": "Estoy preparando la presentación de mis trabajos. Cada proyecto se publicará aquí con su stack técnico, sus capturas y sus enlaces.",
+    "emptyCta": "Hablar de tu proyecto",
+    "ctaLive": "Ver en línea",
+    "ctaCode": "Código",
+    "ctaDetails": "Ver el proyecto",
+    "team": "Proyecto en equipo",
+    "status": {
+      "live": "En línea",
+      "completed": "Terminado",
+      "coming_soon": "Próximamente",
+      "in_progress": "En curso"
+    },
+    "context": {
+      "client": "Proyecto para cliente",
+      "personal": "Proyecto personal",
+      "academic": "Proyecto académico",
+      "internship": "Prácticas"
+    },
+    "categories": {
+      "web": "Web",
+      "mobile": "Móvil",
+      "desktop": "Escritorio"
+    },
+    "shots": "{count, plural, one {# captura} other {# capturas}}",
+    "partsCount": "{count, plural, one {# parte} other {# partes}}",
+    "parts": "Partes del proyecto",
+    "features": "Funcionalidades clave",
+    "highlights": "Puntos fuertes técnicos",
+    "stack": "Tecnologías",
+    "gallery": "Capturas de pantalla",
+    "close": "Cerrar",
+    "prev": "Captura anterior",
+    "next": "Captura siguiente",
+    "zoom": "Ampliar la captura",
+    "unzoom": "Reducir la captura",
+    "position": "{n} de {total}",
+    "noShots": "Las capturas de este proyecto llegarán pronto."
+  },
+  "Contact": {
+    "eyebrow": "Contacto",
+    "title": "Trabajemos juntos",
+    "description": "¿Un proyecto, un encargo, una duda? Descríbeme tu necesidad y te responderé con un alcance, un plazo y un precio claros.",
+    "directTitle": "Contactarme directamente",
+    "formTitle": "Describe tu necesidad",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "whatsapp": "WhatsApp",
+    "responseTime": "Tiempo de respuesta",
+    "responseTimeValue": "Menos de 24 h",
+    "form": {
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre y apellidos",
+      "phone": "Teléfono",
+      "phonePlaceholder": "+213 ...",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "message": "Tu necesidad",
+      "messagePlaceholder": "Describe tu proyecto: qué quieres construir, para quién y para cuándo.",
+      "optional": "(opcional)",
+      "send": "Enviar mi solicitud",
+      "sending": "Enviando…",
+      "again": "Enviar otra solicitud",
+      "note": "Tus datos solo se usan para responderte.",
+      "successTitle": "Solicitud enviada",
+      "successText": "¡Gracias! Te respondo en menos de 24 horas.",
+      "errorTitle": "El envío ha fallado",
+      "errors": {
+        "nameRequired": "Introduce tu nombre.",
+        "nameLong": "El nombre es demasiado largo (120 caracteres como máximo).",
+        "emailRequired": "Introduce tu correo electrónico.",
+        "emailInvalid": "Este correo electrónico no es válido.",
+        "phoneInvalid": "Este número de teléfono no es válido.",
+        "phoneLong": "Este número es demasiado largo (30 caracteres como máximo).",
+        "messageRequired": "Describe tu necesidad.",
+        "messageShort": "Añade algo más de detalle ({min} caracteres como mínimo).",
+        "messageLong": "El mensaje es demasiado largo (5000 caracteres como máximo).",
+        "rateLimit": "Demasiadas solicitudes enviadas. Inténtalo de nuevo en unos minutos o escríbeme directamente por correo.",
+        "invalid": "Uno de los campos no se ha aceptado. Revisa tus datos.",
+        "network": "El servidor no ha respondido. Inténtalo de nuevo o escríbeme directamente por correo."
+      }
+    }
+  }
+}

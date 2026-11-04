@@ -1,0 +1,292 @@
+{
+ "info": {
+  "document_id": "sp12gjemlw7xp0sxa3u2vy9c",
+  "name": "BENLALAM Mohamed Rayane",
+  "title": "Développeur Full Stack",
+  "bio": "Étudiant en Master Ingénierie du Logiciel à l'USTHB d'Alger, je développe des applications web, mobiles et desktop pour des clients professionnels depuis 2 ans. Passionné par la création de solutions numériques complètes, je travaille avec une équipe de développeurs sur des projets réels et ambitieux.",
+  "email": "benlalamrayane@gmail.com",
+  "phone": "+213549107247",
+  "whatsapp": "+213549107247",
+  "github": "Rayane-62",
+  "linkedin": "rayane-benlalam-9b606327a",
+  "available": 1,
+  "stats_projects": 1,
+  "stats_experience": 2,
+  "stats_clients": 2,
+  "name_ar": "بن لعلام محمد ريان",
+  "title_en": "Full Stack Developer",
+  "title_es": "Desarrollador Full Stack",
+  "title_ar": "مطور Full Stack",
+  "bio_en": "Master's student in Software Engineering at USTHB Algiers, I've been building web, mobile, and desktop applications for professional clients for 2 years. Passionate about creating complete digital solutions, I work with a team of developers on real, ambitious projects.",
+  "bio_es": "Estudiante de Máster en Ingeniería del Software en la USTHB de Argel, desarrollo aplicaciones web, móviles y de escritorio para clientes profesionales desde hace 2 años. Apasionado por crear soluciones digitales completas, trabajo con un equipo de desarrolladores en proyectos reales y ambiciosos.",
+  "bio_ar": "طالب ماجستير في هندسة البرمجيات بجامعة USTHB بالجزائر العاصمة، أُطوّر تطبيقات ويب وجوّال وسطح مكتب لعملاء محترفين منذ سنتين. شغوف بابتكار حلول رقمية متكاملة، أعمل ضمن فريق من المطورين على مشاريع حقيقية وطموحة."
+ },
+ "skills": [
+  {
+   "name": "HTML",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "CSS",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "SCSS",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sass/sass-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "JavaScript",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "TypeScript",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "PHP",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "MySQL",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Angular",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angular/angular-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "React",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "Next.js",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "NestJS",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nestjs/nestjs-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Tailwind CSS",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "Node.js",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Java",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+   "category": "mobile"
+  },
+  {
+   "name": "Python",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Kotlin",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg",
+   "category": "mobile"
+  },
+  {
+   "name": "Jetpack Compose",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jetpackcompose/jetpackcompose-original.svg",
+   "category": "mobile"
+  },
+  {
+   "name": "Zustand",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/zustand/zustand-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "Vite",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "React Router",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/reactrouter/reactrouter-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "Expo",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/expo/expo-original.svg",
+   "category": "mobile"
+  },
+  {
+   "name": "React Native",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/reactnative/reactnative-original.svg",
+   "category": "mobile"
+  },
+  {
+   "name": "PostgreSQL",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Prisma",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Redis",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "pnpm",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pnpm/pnpm-original.svg",
+   "category": "tools"
+  },
+  {
+   "name": "Jest",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jest/jest-plain.svg",
+   "category": "tools"
+  },
+  {
+   "name": "ESLint",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/eslint/eslint-original.svg",
+   "category": "tools"
+  },
+  {
+   "name": "Supabase",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Passport.js",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/passport/passport-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Swagger",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/swagger/swagger-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "RxJS",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rxjs/rxjs-original.svg",
+   "category": "backend"
+  },
+  {
+   "name": "Axios",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "PostCSS",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postcss/postcss-original.svg",
+   "category": "frontend"
+  },
+  {
+   "name": "VS Code",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+   "category": "tools"
+  },
+  {
+   "name": "Android Studio",
+   "icon_url": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/androidstudio/androidstudio-original.svg",
+   "category": "tools"
+  }
+ ],
+ "experiences": [
+  {
+   "document_id": "fsa2i25s5m4sglm8rt93rtmq",
+   "position": "Développeur Web",
+   "company": "SARL SIGEAD Infinity-Prod",
+   "period": "Août 2025",
+   "description": "Stage d'été d'un mois en développement web.",
+   "technologies": "[\"HTML\",\"SCSS\",\"TypeScript\",\"PHP\",\"MySQL\",\"Angular\"]",
+   "position_en": "Web Developer",
+   "position_es": "Desarrollador Web",
+   "position_ar": "مطور ويب",
+   "company_en": null,
+   "company_es": null,
+   "company_ar": null,
+   "period_en": "August 2025",
+   "period_es": "Agosto de 2025",
+   "period_ar": "أغسطس 2025",
+   "description_en": "One-month summer internship in web development.",
+   "description_es": "Prácticas de verano de un mes en desarrollo web.",
+   "description_ar": "تدريب صيفي لمدة شهر في تطوير الويب."
+  },
+  {
+   "document_id": "k9wuvwfhflydiym53ensm1oi",
+   "position": "Développeur Freelance",
+   "company": "Indépendant",
+   "period": "Juin 2025 → Présent",
+   "description": "Développement de logiciels web, mobile et desktop pour des clients professionnels.",
+   "technologies": null,
+   "position_en": "Freelance Developer",
+   "position_es": "Desarrollador Freelance",
+   "position_ar": "مطور مستقل",
+   "company_en": "Independent",
+   "company_es": "Independiente",
+   "company_ar": "مستقل",
+   "period_en": "June 2025 → Present",
+   "period_es": "Junio 2025 → Presente",
+   "period_ar": "يونيو 2025 → الحاضر",
+   "description_en": "Building web, mobile, and desktop software for professional clients.",
+   "description_es": "Desarrollo de software web, móvil y de escritorio para clientes profesionales.",
+   "description_ar": "تطوير برمجيات ويب وجوال وسطح مكتب لعملاء محترفين."
+  }
+ ],
+ "educations": [
+  {
+   "document_id": "o7uhz6pg2kna6pza4v2gxxqq",
+   "degree": "Licence en Informatique Générale",
+   "institution": "USTHB - Université des Sciences et de la Technologie Houari Boumediene",
+   "period": "2023 - 2025",
+   "description": null,
+   "current": 0,
+   "order": 1,
+   "degree_en": "Bachelor's in General Computer Science",
+   "degree_es": "Licenciatura en Informática General",
+   "degree_ar": "ليسانس في الإعلام الآلي العام",
+   "institution_en": "USTHB - University of Science and Technology Houari Boumediene",
+   "institution_es": "USTHB - Universidad de Ciencia y Tecnología Houari Boumediene",
+   "institution_ar": "USTHB — جامعة هواري بومدين للعلوم والتكنولوجيا",
+   "period_en": null,
+   "period_es": null,
+   "period_ar": null,
+   "description_en": null,
+   "description_es": null,
+   "description_ar": null
+  },
+  {
+   "document_id": "a6kb0ytu4p5rmm47if4q5z1b",
+   "degree": "Master Ingénierie du Logiciel (IL)",
+   "institution": "USTHB - Université des Sciences et de la Technologie Houari Boumediene",
+   "period": "2025 - 2027",
+   "description": "M1 validé en 2026, M2 en cours.",
+   "current": 1,
+   "order": 2,
+   "degree_en": "Master's in Software Engineering (IL)",
+   "degree_es": "Máster en Ingeniería del Software (IL)",
+   "degree_ar": "ماجستير في هندسة البرمجيات (IL)",
+   "institution_en": "USTHB - University of Science and Technology Houari Boumediene",
+   "institution_es": "USTHB - Universidad de Ciencia y Tecnología Houari Boumediene",
+   "institution_ar": "USTHB — جامعة هواري بومدين للعلوم والتكنولوجيا",
+   "period_en": null,
+   "period_es": null,
+   "period_ar": null,
+   "description_en": "M1 completed in 2026, M2 in progress.",
+   "description_es": "M1 completado en 2026, M2 en curso.",
+   "description_ar": "تم اجتياز السنة الأولى ماستر (M1) في 2026، والسنة الثانية (M2) قيد الإنجاز."
+  }
+ ]
+}
