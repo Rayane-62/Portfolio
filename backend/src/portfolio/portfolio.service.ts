@@ -106,18 +106,24 @@ export class PortfolioService {
           // Galerie simple : seules les parties avec photos ont un onglet. Sous-projets : tous sont affichés.
           sections: p.sections
             .filter((s) => p.hasSubprojects || s.images.length)
-            .map((s) => ({
+            .map((s) => {
+              const subDescription = tr(s, 'description', locale);
+              return {
               id: s.id,
               title: tr(s, 'title', locale),
               subtitle: tr(s, 'subtitle', locale),
-              description: tr(s, 'description', locale),
+              summary: tr(s, 'summary', locale) ?? subDescription?.split(/\n\s*\n/)[0] ?? null,
+              status: s.status,
+              description: subDescription,
               features: lines(tr(s, 'features', locale)),
+              highlights: lines(tr(s, 'highlights', locale)),
               platforms: s.platforms,
               technologies: s.technologies,
               liveUrl: s.liveUrl,
               githubUrl: s.githubUrl,
               images: s.images.map((img) => ({ id: img.id, url: img.url, width: img.width, height: img.height })),
-            })),
+              };
+            }),
           // Les parties sans photo restent listées dans « Parties du projet ».
           parts: p.sections.map((s) => ({ title: tr(s, 'title', locale), subtitle: tr(s, 'subtitle', locale) })),
         };

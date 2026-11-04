@@ -93,8 +93,13 @@ export type ProjectSection = {
   id: number;
   title: string;
   subtitle: string | null;
+  /** Texte court de la carte du sous-projet. */
+  summary: string | null;
+  /** null = pas de badge. */
+  status: ProjectStatus | null;
   description: string | null;
   features: string[];
+  highlights: string[];
   platforms: Platform[];
   technologies: string[];
   liveUrl: string | null;
@@ -206,6 +211,7 @@ function normalize(raw: unknown, locale: Locale): Portfolio {
             ? p.sections.map((s) => ({
                 ...s,
                 features: Array.isArray(s.features) ? s.features : [],
+                highlights: Array.isArray(s.highlights) ? s.highlights : [],
                 platforms: Array.isArray(s.platforms) ? s.platforms : [],
                 technologies: Array.isArray(s.technologies) ? s.technologies : [],
                 images: Array.isArray(s.images) ? s.images : [],

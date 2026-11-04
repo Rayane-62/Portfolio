@@ -29,6 +29,13 @@
       "when": 1793802080131,
       "tag": "0003_subprojects",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793805996631,
+      "tag": "0004_subproject_fields",
+      "breakpoints": true
     }
   ]
 }

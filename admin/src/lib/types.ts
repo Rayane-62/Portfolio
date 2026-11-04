@@ -196,6 +196,12 @@ export interface ProjectSection {
   subtitleEs: string | null;
   subtitleAr: string | null;
   /** Champs des sous-projets. */
+  summary: string | null;
+  summaryEn: string | null;
+  summaryEs: string | null;
+  summaryAr: string | null;
+  /** null = pas de badge. */
+  status: ProjectStatus | null;
   description: string | null;
   descriptionEn: string | null;
   descriptionEs: string | null;
@@ -204,6 +210,10 @@ export interface ProjectSection {
   featuresEn: string | null;
   featuresEs: string | null;
   featuresAr: string | null;
+  highlights: string;
+  highlightsEn: string | null;
+  highlightsEs: string | null;
+  highlightsAr: string | null;
   platforms: Platform[];
   technologies: string[];
   liveUrl: string | null;

@@ -135,7 +135,6 @@ function Row({ p, index, count, busy, onMove, onDelete }: { p: ProjectListItem; 
           <div className="flex flex-wrap items-center gap-2">
             <span className={`pill ${PROJECT_STATUS[p.status].pill}`}>{PROJECT_STATUS[p.status].label}</span>
             {PROJECT_ORDER.filter((c) => p.categories.includes(c)).map((c) => <span key={c} className="pill pill-violet">{PROJECT_CATEGORIES[c].label}</span>)}
-            {p.team && <span className="pill">Équipe</span>}
             {p.featured && <span className="pill pill-accent"><IconStar size={11} /> En avant</span>}
             {!p.visible && <span className="pill pill-off"><i />Masqué</span>}
           </div>

@@ -49,7 +49,6 @@ export function ProjectDialog({ project: p, onClose }: { project: Project; onClo
             ) : (
               <p className="pd-badges">
                 <span className={`badge st-${p.status}`}>{t(`status.${p.status}`)}</span>
-                {p.team && <span className="badge">{t("team")}</span>}
                 {p.context && <span className="badge">{t(`context.${p.context}`)}</span>}
                 {p.categories.length > 0 && (
                   <span className="kind">{p.categories.map((c) => t(`categories.${c}`)).join(" · ")}</span>
@@ -57,14 +56,14 @@ export function ProjectDialog({ project: p, onClose }: { project: Project; onClo
               </p>
             )}
             <h2 id={`pd-title-${p.id}`}>{sub ? sub.title : p.title}</h2>
-            {sub && (sub.subtitle || sub.platforms.length > 0) && (
+            {sub && (sub.status || sub.platforms.length > 0) && (
               <p className="pd-badges pd-under">
+                {sub.status && <span className={`badge st-${sub.status}`}>{t(`status.${sub.status}`)}</span>}
                 {sub.platforms.map((pl) => (
                   <span className="badge" key={pl}>
                     {t(`platforms.${pl}`)}
                   </span>
                 ))}
-                {sub.subtitle && <span className="pd-sub-inline">{sub.subtitle}</span>}
               </p>
             )}
           </div>
@@ -116,8 +115,9 @@ function SubCard({ sub, onOpen }: { sub: ProjectSection; onOpen: () => void }) {
       </span>
       <span className="info">
         <b>{sub.title}</b>
-        {sub.subtitle && <span className="subt">{sub.subtitle}</span>}
+        {sub.summary && <span className="subt">{sub.summary}</span>}
         <span className="plats">
+          {sub.status && <span className={`badge st-${sub.status}`}>{t(`status.${sub.status}`)}</span>}
           {sub.platforms.map((pl) => (
             <span className="badge" key={pl}>
               {t(`platforms.${pl}`)}
@@ -146,8 +146,9 @@ function SubprojectView({ project: p, sub }: { project: Project; sub: ProjectSec
       )}
       <div className="pd-body">
         <div className="pd-main">
-          <Paragraphs text={sub.description} />
+          <Paragraphs text={sub.description || sub.summary} />
           <List title={t("features")} items={sub.features} />
+          <List title={t("highlights")} items={sub.highlights} />
         </div>
         <aside className="pd-side">
           <Stack technologies={sub.technologies} />

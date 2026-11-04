@@ -32,7 +32,6 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
                 <ProjectThumb title={p.title} imageUrl={p.coverUrl} />
                 <span className="badges">
                   <span className={`badge st-${p.status}`}>{t(`status.${p.status}`)}</span>
-                  {p.team && <span className="badge">{t("team")}</span>}
                 </span>
               </button>
               <div className="body">

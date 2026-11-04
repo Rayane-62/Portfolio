@@ -350,6 +350,24 @@ export class CreateSectionDto {
   @Transform(emptyToNull)
   @ValidateIf((_, v) => v !== null)
   @IsString()
+  @MaxLength(400)
+  summary?: string | null;
+
+  @Traduction(400) summaryEn?: string | null;
+  @Traduction(400) summaryEs?: string | null;
+  @Traduction(400) summaryAr?: string | null;
+
+  /** NULL = pas de badge de statut. */
+  @IsOptional()
+  @Transform(emptyToNull)
+  @ValidateIf((_, v) => v !== null)
+  @IsIn(projectStatus.enumValues, { message: 'Statut inconnu' })
+  status?: ProjectStatus | null;
+
+  @IsOptional()
+  @Transform(emptyToNull)
+  @ValidateIf((_, v) => v !== null)
+  @IsString()
   @MaxLength(6000)
   description?: string | null;
 
@@ -367,6 +385,17 @@ export class CreateSectionDto {
   @Traduction(4000) featuresEn?: string | null;
   @Traduction(4000) featuresEs?: string | null;
   @Traduction(4000) featuresAr?: string | null;
+
+  /** Points forts techniques, un par ligne. */
+  @IsOptional()
+  @Transform(trimKeepLines)
+  @IsString()
+  @MaxLength(4000)
+  highlights?: string;
+
+  @Traduction(4000) highlightsEn?: string | null;
+  @Traduction(4000) highlightsEs?: string | null;
+  @Traduction(4000) highlightsAr?: string | null;
 
   /** ['web', 'android', 'ios', 'desktop'] */
   @IsOptional()

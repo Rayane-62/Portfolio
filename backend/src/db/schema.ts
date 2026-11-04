@@ -274,6 +274,13 @@ export const projectSections = pgTable(
     subtitleAr: varchar('subtitle_ar', { length: 200 }),
 
     // Champs utilisés quand le projet a des sous-projets (hasSubprojects).
+    /** Une ou deux phrases pour la carte du sous-projet. */
+    summary: text('summary'),
+    summaryEn: text('summary_en'),
+    summaryEs: text('summary_es'),
+    summaryAr: text('summary_ar'),
+    /** NULL = pas de badge (même statut que le projet). */
+    status: projectStatus('status'),
     description: text('description'),
     descriptionEn: text('description_en'),
     descriptionEs: text('description_es'),
@@ -283,6 +290,11 @@ export const projectSections = pgTable(
     featuresEn: text('features_en'),
     featuresEs: text('features_es'),
     featuresAr: text('features_ar'),
+    /** Points forts techniques, un par ligne. */
+    highlights: text('highlights').notNull().default(''),
+    highlightsEn: text('highlights_en'),
+    highlightsEs: text('highlights_es'),
+    highlightsAr: text('highlights_ar'),
     /** ['web', 'android', 'ios', 'desktop'] */
     platforms: jsonb('platforms').$type<Platform[]>().notNull().default([]),
     technologies: jsonb('technologies').$type<string[]>().notNull().default([]),

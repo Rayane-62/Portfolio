@@ -1,20 +1,22 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { type DragEvent, useRef, useState } from 'react';
 import { IconClose, IconImage, IconPlus, IconStar } from '@/components/icons';
-import { Button, DeleteButton, ErrorText, Field, LoadError, Loading, OrderButtons, Spinner, TechInput, TransField } from '@/components/ui';
+import { Button, DeleteButton, ErrorText, Field, LoadError, Loading, OrderButtons, Segmented, Spinner, TechInput, TransField } from '@/components/ui';
 import { api, errMsg, upload } from '@/lib/api';
-import { LOCALES, locField, PLATFORM_LABELS, PLATFORM_ORDER, plural } from '@/lib/format';
+import { LOCALES, locField, PLATFORM_LABELS, PLATFORM_ORDER, plural, PROJECT_STATUS, STATUS_ORDER } from '@/lib/format';
 import { keys, queryClient, refresh } from '@/lib/queries';
-import type { Locale, Platform, ProjectImage, ProjectSection } from '@/lib/types';
+import type { Locale, Platform, ProjectImage, ProjectSection, ProjectStatus } from '@/lib/types';
 import { confirm, toast } from '@/store/ui';
 
 const MAX_IMAGE_MB = 15;
-const SECTION_FIELDS = ['title', 'subtitle', 'description', 'features'] as const;
+const SECTION_FIELDS = ['title', 'subtitle', 'summary', 'description', 'features', 'highlights'] as const;
 type SectionTexts = Record<(typeof SECTION_FIELDS)[number], Record<Locale, string>>;
 
 /** Tout ce qui se modifie dans une partie / un sous-projet (hors photos). */
 interface SectionForm {
   texts: SectionTexts;
+  /** 'none' = pas de badge (null dans l'API). */
+  status: ProjectStatus | 'none';
   platforms: Platform[];
   technologies: string[];
   liveUrl: string;
@@ -34,21 +36,44 @@ function moved<T extends { id: number }>(list: T[], i: number, d: -1 | 1) {
  * Les parties d'un projet et leurs photos. Chaque action est enregistrée tout de suite
  * (pas besoin du bouton « Enregistrer » du projet) ; l'API renvoie la liste à jour.
  */
-export function ProjectGallery({ projectId, loc, coverChosen, sub }: { projectId: number; loc: Locale; coverChosen: boolean; sub: boolean }) {
+export function ProjectGallery({
+  projectId, loc, coverChosen, sub, ensureProject, onCreated,
+}: {
+  /** null = projet pas encore enregistré. */
+  projectId: number | null;
+  loc: Locale;
+  coverChosen: boolean;
+  sub: boolean;
+  /** Crée le projet s'il n'existe pas encore et renvoie son id. */
+  ensureProject: () => Promise<number>;
+  /** Appelé après la 1re partie d'un projet tout juste créé. */
+  onCreated: (id: number) => void;
+}) {
   const q = useQuery({
-    queryKey: sectionsKey(projectId),
+    queryKey: sectionsKey(projectId ?? 0),
     queryFn: () => api<ProjectSection[]>(`/admin/projects/${projectId}/sections`),
+    enabled: projectId !== null,
   });
   const [newTitle, setNewTitle] = useState('');
 
   const apply = (sections: ProjectSection[]) => {
-    queryClient.setQueryData(sectionsKey(projectId), sections);
+    if (projectId !== null) queryClient.setQueryData(sectionsKey(projectId), sections);
     refresh(keys.projects);
   };
 
   const create = useMutation({
-    mutationFn: (title: string) => api<ProjectSection[]>(`/admin/projects/${projectId}/sections`, { method: 'POST', json: { title } }),
-    onSuccess: (s) => { apply(s); setNewTitle(''); toast('Partie ajoutée'); },
+    mutationFn: async (title: string) => {
+      const id = await ensureProject();
+      const sections = await api<ProjectSection[]>(`/admin/projects/${id}/sections`, { method: 'POST', json: { title } });
+      return { id, sections };
+    },
+    onSuccess: ({ id, sections }) => {
+      queryClient.setQueryData(sectionsKey(id), sections);
+      refresh(keys.projects);
+      setNewTitle('');
+      toast(sub ? 'Sous-projet ajouté' : 'Partie ajoutée');
+      if (projectId === null) onCreated(id);
+    },
     onError: (e) => toast(errMsg(e), 'error'),
   });
   const reorder = useMutation({
@@ -57,9 +82,15 @@ export function ProjectGallery({ projectId, loc, coverChosen, sub }: { projectId
     onError: (e) => toast(errMsg(e), 'error'),
   });
 
-  if (q.isPending) return <Loading rows={2} />;
+  function addSection() {
+    const t = newTitle.trim();
+    if (!t) return toast(sub ? 'Donne un nom au sous-projet (ex. « App livreur »).' : 'Donne un nom à la partie (ex. « Site admin »).', 'error');
+    if (!create.isPending) create.mutate(t);
+  }
+
+  if (projectId !== null && q.isPending) return <Loading rows={2} />;
   if (q.isError) return <LoadError error={q.error} retry={q.refetch} />;
-  const sections = q.data;
+  const sections = q.data ?? [];
   const total = sections.reduce((n, s) => n + s.images.length, 0);
   const firstImage = sections.find((s) => s.images.length)?.images[0];
 
@@ -76,7 +107,7 @@ export function ProjectGallery({ projectId, loc, coverChosen, sub }: { projectId
       {sections.map((s, i) => (
         <SectionCard
           key={s.id}
-          projectId={projectId}
+          projectId={projectId!}
           section={s}
           loc={loc}
           index={i}
@@ -89,21 +120,21 @@ export function ProjectGallery({ projectId, loc, coverChosen, sub }: { projectId
         />
       ))}
 
-      <form
-        className="flex flex-wrap items-end gap-2.5"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const t = newTitle.trim();
-          if (!t) return toast('Donne un nom à la partie (ex. « Site admin »).', 'error');
-          create.mutate(t);
-        }}
-      >
+      {/* Pas de <form> : ce bloc est déjà dans le formulaire du projet, un formulaire imbriqué l'enverrait aussi. */}
+      <div className="flex flex-wrap items-end gap-2.5">
         <label className="flex min-w-[220px] flex-1 flex-col gap-1.5">
           <span className="label">{sub ? 'Nouveau sous-projet' : 'Nouvelle partie'}</span>
-          <input className="input" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} maxLength={120} placeholder={sections.length ? 'App livreur' : 'Web admin'} />
+          <input
+            className="input"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSection(); } }}
+            maxLength={120}
+            placeholder={sections.length ? 'App livreur' : 'Web admin'}
+          />
         </label>
-        <Button type="submit" variant="ghost" loading={create.isPending}><IconPlus size={16} /> {sub ? 'Ajouter le sous-projet' : 'Ajouter la partie'}</Button>
-      </form>
+        <Button variant="ghost" loading={create.isPending} onClick={addSection}><IconPlus size={16} /> {sub ? 'Ajouter le sous-projet' : 'Ajouter la partie'}</Button>
+      </div>
     </div>
   );
 }
@@ -113,6 +144,7 @@ function formOf(s: ProjectSection): SectionForm {
     texts: Object.fromEntries(
       SECTION_FIELDS.map((f) => [f, Object.fromEntries(LOCALES.map((l) => [l, (s as unknown as Record<string, string | null>)[locField(f, l)] ?? '']))]),
     ) as SectionTexts,
+    status: s.status ?? 'none',
     platforms: s.platforms ?? [],
     technologies: s.technologies ?? [],
     liveUrl: s.liveUrl ?? '',
@@ -156,6 +188,7 @@ function SectionCard({
   const save = useMutation({
     mutationFn: () => {
       const json: Record<string, unknown> = {
+        status: form.status === 'none' ? null : form.status,
         platforms: PLATFORM_ORDER.filter((p) => form.platforms.includes(p)),
         technologies: form.technologies,
         liveUrl: form.liveUrl.trim(),
@@ -229,7 +262,11 @@ function SectionCard({
   const uploading = progress !== null;
 
   return (
-    <section className="rounded-2xl border border-line bg-sunk/40 p-4">
+    <section
+      className="rounded-2xl border border-line bg-sunk/40 p-4"
+      // Entrée dans un champ ne doit pas envoyer le formulaire du projet (qui contient ce bloc).
+      onKeyDown={(e) => { if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') e.preventDefault(); }}
+    >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <b className="display text-[15px]">
           {texts.title.fr.trim() || section.title}
@@ -254,10 +291,22 @@ function SectionCard({
 
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
         <TransField label={sub ? 'Nom du sous-projet' : 'Nom de la partie'} loc={loc} values={texts.title} onChange={setText('title')} maxLength={120} placeholder={sub ? 'App livreur' : 'Site admin'} />
-        <TransField label="Sous-titre" loc={loc} values={texts.subtitle} onChange={setText('subtitle')} maxLength={200} placeholder={sub ? 'Pour les livreurs indépendants' : 'Web · Android · iOS'} />
+        {sub ? (
+          <Field label="Statut" as="div">
+            <Segmented
+              value={form.status}
+              onChange={(v) => setField('status', v)}
+              label="Statut du sous-projet"
+              options={[['none', 'Aucun'], ...STATUS_ORDER.map((st) => [st, PROJECT_STATUS[st].label] as [ProjectStatus, string])]}
+            />
+          </Field>
+        ) : (
+          <TransField label="Sous-titre" loc={loc} values={texts.subtitle} onChange={setText('subtitle')} maxLength={200} placeholder="Web · Android · iOS" />
+        )}
       </div>
       {sub && (
         <div className="mt-3 flex flex-col gap-3">
+          <TransField label="Résumé (carte)" loc={loc} values={texts.summary} onChange={setText('summary')} maxLength={400} rows={2} placeholder="L'app des livreurs : courses, gains, documents." hint="1 ou 2 phrases. Vide = le 1er paragraphe de la description." />
           <Field label="Plateformes" as="div">
             <div className="seg" role="group" aria-label="Plateformes du sous-projet">
               {PLATFORM_ORDER.map((p) => (
@@ -273,7 +322,8 @@ function SectionCard({
             </div>
           </Field>
           <TransField label="Description" loc={loc} values={texts.description} onChange={setText('description')} maxLength={6000} rows={4} placeholder="Ce que fait ce sous-projet, pour qui." />
-          <TransField label="Fonctionnalités" loc={loc} values={texts.features} onChange={setText('features')} maxLength={4000} rows={4} placeholder={'Suivi des courses en temps réel\nHistorique des gains'} hint="Une par ligne." />
+          <TransField label="Fonctionnalités clés" loc={loc} values={texts.features} onChange={setText('features')} maxLength={4000} rows={4} placeholder={'Suivi des courses en temps réel\nHistorique des gains'} hint="Facultatif. Une par ligne." />
+          <TransField label="Points forts techniques" loc={loc} values={texts.highlights} onChange={setText('highlights')} maxLength={4000} rows={3} placeholder="Géolocalisation en arrière-plan" hint="Facultatif. Un par ligne." />
           <Field label="Technologies" as="div">
             <TechInput value={form.technologies} onChange={(v) => setField('technologies', v)} suggestions={['React Native', 'Expo', 'Next.js', 'React', 'Vite', 'NestJS']} />
           </Field>

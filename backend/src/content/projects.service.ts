@@ -21,8 +21,10 @@ const FIELDS = [
 const SECTION_FIELDS = [
   'title', 'titleEn', 'titleEs', 'titleAr',
   'subtitle', 'subtitleEn', 'subtitleEs', 'subtitleAr',
+  'summary', 'summaryEn', 'summaryEs', 'summaryAr', 'status',
   'description', 'descriptionEn', 'descriptionEs', 'descriptionAr',
   'features', 'featuresEn', 'featuresEs', 'featuresAr',
+  'highlights', 'highlightsEn', 'highlightsEs', 'highlightsAr',
   'platforms', 'technologies', 'liveUrl', 'githubUrl',
 ] as const;
 

@@ -349,6 +349,7 @@ async function main() {
   check('plateforme inconnue refusée (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { platforms: ['tv'] })).status === 400);
   const sub = await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, {
     description: 'Back-office complet.', features: '- Validation des livreurs\n- Statistiques', platforms: ['web'],
+    summary: 'Le back-office.', status: 'in_progress', highlights: 'Rôles configurables',
     technologies: ['React', 'Vite'], liveUrl: 'https://admin.example.com',
   });
   check('sous-projet enregistré', sub.status === 200 && sub.data.find((x) => x.id === s1.id).platforms.join() === 'web', sub.data);
@@ -357,6 +358,8 @@ async function main() {
   const pubSub = (await call('GET', '/public/portfolio?locale=fr', null, false)).data.projects.find((p) => p.id === proj.data.id);
   const s1Pub = pubSub.sections.find((x) => x.id === s1.id);
   check('site : avec sous-projets, toutes les parties sont affichées (même sans photo)', pubSub.hasSubprojects === true && pubSub.sections.length === 2, pubSub.sections.map((x) => x.title));
+  check('site : résumé, statut et points forts du sous-projet', s1Pub?.summary === 'Le back-office.' && s1Pub.status === 'in_progress' && JSON.stringify(s1Pub.highlights) === '["Rôles configurables"]', s1Pub);
+  check('statut de sous-projet inconnu refusé (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { status: 'fini' })).status === 400);
   check('site : détail du sous-projet', s1Pub?.description === 'Back-office complet.' && JSON.stringify(s1Pub.features) === '["Validation des livreurs","Statistiques"]' && s1Pub.technologies.length === 2 && s1Pub.liveUrl === 'https://admin.example.com', s1Pub);
   await call('PATCH', `/admin/projects/${proj.data.id}`, { hasSubprojects: false });
   const delImg = await call('DELETE', `/admin/projects/${proj.data.id}/images/${imgs[0].id}`);

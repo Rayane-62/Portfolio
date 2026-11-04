@@ -27,7 +27,6 @@ interface FormState {
   status: ProjectStatus;
   /** 'none' = non précisé (null dans l'API). */
   context: ProjectContext | 'none';
-  team: boolean;
   hasSubprojects: boolean;
   technologies: string[];
   imageUrl: string | null;
@@ -43,7 +42,6 @@ const empty = (): FormState => ({
   categories: ['web'],
   status: 'completed',
   context: 'none',
-  team: false,
   hasSubprojects: false,
   technologies: [],
   imageUrl: null,
@@ -61,7 +59,6 @@ const fromProject = (p: Project): FormState => ({
   categories: p.categories,
   status: p.status,
   context: p.context ?? 'none',
-  team: p.team,
   hasSubprojects: p.hasSubprojects,
   technologies: p.technologies,
   imageUrl: p.imageUrl,
@@ -146,13 +143,12 @@ function ProjectForm({ project }: { project: Project | null }) {
     addFile(e.dataTransfer.files[0]);
   }
 
-  const save = useMutation({
-    mutationFn: () => {
+  /** Corps envoyé à l'API : tout le formulaire. */
+  const payload = () => {
       const json: Record<string, unknown> = {
         categories: PROJECT_ORDER.filter((c) => f.categories.includes(c)),
         status: f.status,
         context: f.context === 'none' ? null : f.context,
-        team: f.team,
         hasSubprojects: f.hasSubprojects,
         technologies: f.technologies,
         imageUrl: f.imageUrl,
@@ -163,6 +159,50 @@ function ProjectForm({ project }: { project: Project | null }) {
         visible: f.visible,
       };
       for (const k of FIELDS) for (const l of LOCALES) json[locField(k, l)] = f.texts[k][l].trim();
+      return json;
+  };
+
+  /**
+   * Projet pas encore enregistré : on le crée tout de suite, masqué, avec ce qui est déjà rempli,
+   * pour pouvoir ajouter des sous-projets / photos sans attendre d'avoir tout écrit.
+   */
+  async function ensureProject(): Promise<number> {
+    if (project) return project.id;
+    const json = payload();
+    if (!f.texts.title.fr.trim()) json.title = 'Nouveau projet';
+    if (!f.categories.length) json.categories = ['web'];
+    for (const k of ['liveUrl', 'githubUrl'] as const) if (!/^https?:\/\//.test(f[k].trim())) json[k] = '';
+    json.visible = false;
+    const created = await api<Project>('/admin/projects', { method: 'POST', json });
+    refresh(keys.projects);
+    toast('Projet enregistré en masqué. Active « Afficher sur le site » quand il est prêt.');
+    return created.id;
+  }
+
+  /** Une fois le projet créé par ensureProject, on passe sur sa page de modification. */
+  function openCreated(id: number) {
+    leaving.current = true;
+    navigate(`/projets/${id}`, { replace: true });
+  }
+
+  /** Projet existant : l'option « sous-projets » est enregistrée tout de suite. */
+  async function toggleSubprojects(v: boolean) {
+    set('hasSubprojects', v);
+    if (!project) return;
+    try {
+      await api(`/admin/projects/${project.id}`, { method: 'PATCH', json: { hasSubprojects: v } });
+      setInitial((prev) => JSON.stringify({ ...JSON.parse(prev), hasSubprojects: v }));
+      refresh(keys.projects);
+      toast(v ? 'Sous-projets activés' : 'Sous-projets désactivés');
+    } catch (e) {
+      set('hasSubprojects', !v);
+      toast(errMsg(e), 'error');
+    }
+  }
+
+  const save = useMutation({
+    mutationFn: () => {
+      const json = payload();
       return project
         ? api<Project>(`/admin/projects/${project.id}`, { method: 'PATCH', json })
         : api<Project>('/admin/projects', { method: 'POST', json });
@@ -240,7 +280,7 @@ function ProjectForm({ project }: { project: Project | null }) {
               maxLength={4000}
               rows={6}
               placeholder={'Paiement à la livraison\nSuivi de commande en temps réel\n4 types de comptes'}
-              hint="Une par ligne. Les tirets en début de ligne sont retirés."
+              hint="Facultatif. Une par ligne, les tirets en début de ligne sont retirés. Vide = la section n'apparaît pas."
             />
             <TransField
               label="Points forts techniques"
@@ -250,7 +290,7 @@ function ProjectForm({ project }: { project: Project | null }) {
               maxLength={4000}
               rows={4}
               placeholder={'Dispatch géolocalisé avec PostGIS\nMonorepo pnpm partagé entre 6 apps'}
-              hint="Un par ligne. Ce qui impressionnerait un recruteur."
+              hint="Facultatif. Un par ligne : ce qui impressionnerait un recruteur. Vide = la section n'apparaît pas."
             />
           </section>
 
@@ -281,12 +321,11 @@ function ProjectForm({ project }: { project: Project | null }) {
                 options={[['none', 'Non précisé'], ...CONTEXT_ORDER.map((c) => [c, PROJECT_CONTEXT[c]] as [ProjectContext, string])]}
               />
             </Field>
-            <SwitchRow label="Projet en équipe" hint="Ajoute le badge « Projet en équipe » sur la carte." checked={f.team} onChange={(v) => set('team', v)} />
             <SwitchRow
               label="Ce projet a des sous-projets"
-              hint="Ex. Quick : app livreur, app client, web partenaire… Chaque sous-projet a sa description, ses plateformes, ses technologies et ses photos. Pense à enregistrer le projet après l'avoir changé."
+              hint="Ex. Quick : app livreur, app client, web partenaire… Chaque sous-projet a son titre, son résumé, sa description, ses liens, ses photos, etc."
               checked={f.hasSubprojects}
-              onChange={(v) => set('hasSubprojects', v)}
+              onChange={toggleSubprojects}
             />
             <Field label="Technologies" as="div">
               <TechInput value={f.technologies} onChange={(v) => set('technologies', v)} suggestions={TECH_SUGGESTIONS} />
@@ -325,11 +364,14 @@ function ProjectForm({ project }: { project: Project | null }) {
               {f.hasSubprojects ? 'Sous-projets' : 'Galerie'}
               <span className="label">Langue des textes : {loc.toUpperCase()}</span>
             </h2>
-            {project ? (
-              <ProjectGallery projectId={project.id} loc={loc} coverChosen={!!f.imageUrl} sub={f.hasSubprojects} />
-            ) : (
-              <p className="note m-0">Ajoute d'abord le projet : la galerie (parties et photos) se remplit ensuite, depuis cette page.</p>
-            )}
+            <ProjectGallery
+              projectId={project?.id ?? null}
+              loc={loc}
+              coverChosen={!!f.imageUrl}
+              sub={f.hasSubprojects}
+              ensureProject={ensureProject}
+              onCreated={openCreated}
+            />
           </section>
 
           <section className="panel grid grid-cols-2 gap-3.5 max-sm:grid-cols-1">
@@ -388,7 +430,6 @@ function ProjectForm({ project }: { project: Project | null }) {
             <div className={`flex flex-col gap-2 p-4 ${loc === 'ar' ? 'ar' : ''}`}>
               <span className="flex flex-wrap items-center gap-1.5">
                 <span className={`pill ${PROJECT_STATUS[f.status].pill}`}>{PROJECT_STATUS[f.status].label}</span>
-                {f.team && <span className="pill">Équipe</span>}
                 <span className="label">{PROJECT_ORDER.filter((c) => f.categories.includes(c)).map((c) => PROJECT_CATEGORIES[c].label).join(' · ')}</span>
               </span>
               <b className="display text-[17px] break-words">{title || 'Titre du projet'}</b>
