@@ -73,16 +73,46 @@ export type Education = {
   current: boolean;
 };
 
+export type ProjectCategory = "web" | "mobile" | "desktop";
+export type ProjectStatus = "live" | "completed" | "coming_soon" | "in_progress";
+export type ProjectContext = "client" | "personal" | "academic" | "internship";
+
+export type ProjectImage = {
+  id: number;
+  url: string;
+  width: number;
+  height: number;
+};
+
+/** Un onglet de la fenêtre du projet : une partie qui a des photos. */
+export type ProjectSection = {
+  id: number;
+  title: string;
+  subtitle: string | null;
+  images: ProjectImage[];
+};
+
 export type Project = {
   id: number;
   title: string;
-  description: string;
-  category: "web" | "mobile" | "desktop";
-  technologies: string[] | null;
-  imageUrl: string | null;
+  /** Texte court de la carte. */
+  summary: string | null;
+  description: string | null;
+  features: string[];
+  highlights: string[];
+  categories: ProjectCategory[];
+  status: ProjectStatus;
+  context: ProjectContext | null;
+  team: boolean;
+  technologies: string[];
+  /** Couverture : image choisie ou 1re photo de la galerie. */
+  coverUrl: string | null;
   liveUrl: string | null;
   githubUrl: string | null;
   featured: boolean;
+  sections: ProjectSection[];
+  /** Toutes les parties, y compris celles sans photo. */
+  parts: { title: string; subtitle: string | null }[];
 };
 
 export type Portfolio = {
@@ -153,7 +183,18 @@ function normalize(raw: unknown, locale: Locale): Portfolio {
     skills: { ...EMPTY_SKILLS, ...(data.skills ?? {}) },
     experiences: Array.isArray(data.experiences) ? data.experiences : [],
     educations: Array.isArray(data.educations) ? data.educations : [],
-    projects: Array.isArray(data.projects) ? data.projects : [],
+    projects: Array.isArray(data.projects)
+      ? data.projects.map((p) => ({
+          ...p,
+          features: Array.isArray(p.features) ? p.features : [],
+          highlights: Array.isArray(p.highlights) ? p.highlights : [],
+          categories: Array.isArray(p.categories) ? p.categories : [],
+          technologies: Array.isArray(p.technologies) ? p.technologies : [],
+          sections: Array.isArray(p.sections) ? p.sections : [],
+          parts: Array.isArray(p.parts) ? p.parts : [],
+          status: p.status ?? "completed",
+        }))
+      : [],
   };
 }
 

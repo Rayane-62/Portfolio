@@ -76,7 +76,40 @@
     "emptyText": "أُحضّر عرض أعمالي. سيُنشر كل مشروع هنا مع التقنيات المستخدمة وصوره وروابطه.",
     "emptyCta": "حدّثني عن مشروعك",
     "ctaLive": "عرض مباشر",
-    "ctaCode": "الكود"
+    "ctaCode": "الكود",
+    "ctaDetails": "عرض المشروع",
+    "team": "مشروع جماعي",
+    "status": {
+      "live": "متاح على الإنترنت",
+      "completed": "مكتمل",
+      "coming_soon": "قريبًا على الإنترنت",
+      "in_progress": "قيد التطوير"
+    },
+    "context": {
+      "client": "مشروع لعميل",
+      "personal": "مشروع شخصي",
+      "academic": "مشروع دراسي",
+      "internship": "تربص"
+    },
+    "categories": {
+      "web": "ويب",
+      "mobile": "جوال",
+      "desktop": "سطح المكتب"
+    },
+    "shots": "{count, plural, zero {# صورة} one {صورة واحدة} two {صورتان} few {# صور} many {# صورة} other {# صورة}}",
+    "partsCount": "{count, plural, zero {# جزء} one {جزء واحد} two {جزءان} few {# أجزاء} many {# جزءًا} other {# جزء}}",
+    "parts": "أجزاء المشروع",
+    "features": "الميزات الرئيسية",
+    "highlights": "نقاط القوة التقنية",
+    "stack": "التقنيات",
+    "gallery": "لقطات الشاشة",
+    "close": "إغلاق",
+    "prev": "اللقطة السابقة",
+    "next": "اللقطة التالية",
+    "zoom": "تكبير اللقطة",
+    "unzoom": "تصغير اللقطة",
+    "position": "{n} من {total}",
+    "noShots": "لقطات هذا المشروع قادمة قريبًا."
   },
   "Contact": {
     "eyebrow": "اتصل",

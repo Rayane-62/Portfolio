@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Scramble } from "@/components/scramble";
-import { IconBox, IconExternal, IconMail } from "@/components/icons";
-import { ProjectThumb } from "@/components/project-thumb";
+import { IconBox, IconMail } from "@/components/icons";
+import { ProjectGrid } from "@/components/project-grid";
 import type { Project } from "@/lib/api";
 
 /* Les projets viennent de l'admin. Aucun projet n'est codé en dur ici :
@@ -35,53 +35,7 @@ export async function Projects({ projects }: { projects: Project[] }) {
             </a>
           </div>
         ) : (
-          <div
-            className="proj-grid z-in"
-            style={{ "--i": 2 } as React.CSSProperties}
-          >
-            {projects.map((p) => (
-              <article className="card proj" key={p.id}>
-                <ProjectThumb title={p.title} imageUrl={p.imageUrl} />
-                <div className="body">
-                  <h3>{p.title}</h3>
-                  <p>{p.description}</p>
-                  {p.technologies && p.technologies.length > 0 && (
-                    <div className="tags">
-                      {p.technologies.map((tech) => (
-                        <span className="tag" key={tech}>
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="links">
-                    {p.liveUrl && (
-                      <a
-                        className="mini"
-                        href={p.liveUrl}
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        <IconExternal />
-                        {t("ctaLive")}
-                      </a>
-                    )}
-                    {p.githubUrl && (
-                      <a
-                        className="mini"
-                        href={p.githubUrl}
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        <IconExternal />
-                        {t("ctaCode")}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+          <ProjectGrid projects={projects} />
         )}
       </div>
     </section>

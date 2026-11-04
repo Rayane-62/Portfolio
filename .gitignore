@@ -10,6 +10,7 @@ coverage/
 backend/uploads/
 backups/
 _to_delete/
+_tmp/
 .DS_Store
 Thumbs.db
 *.log

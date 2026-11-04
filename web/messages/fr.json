@@ -76,7 +76,40 @@
     "emptyText": "Je prépare la présentation de mes réalisations. Chaque projet sera publié ici avec sa stack technique, ses captures et ses liens.",
     "emptyCta": "Parler de votre projet",
     "ctaLive": "Voir en ligne",
-    "ctaCode": "Code"
+    "ctaCode": "Code",
+    "ctaDetails": "Voir le projet",
+    "team": "Projet en équipe",
+    "status": {
+      "live": "En ligne",
+      "completed": "Terminé",
+      "coming_soon": "Bientôt en ligne",
+      "in_progress": "En cours"
+    },
+    "context": {
+      "client": "Mission client",
+      "personal": "Projet personnel",
+      "academic": "Projet d'études",
+      "internship": "Stage"
+    },
+    "categories": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "desktop": "Desktop"
+    },
+    "shots": "{count, plural, one {# capture} other {# captures}}",
+    "partsCount": "{count, plural, one {# partie} other {# parties}}",
+    "parts": "Parties du projet",
+    "features": "Fonctionnalités clés",
+    "highlights": "Points forts techniques",
+    "stack": "Technologies",
+    "gallery": "Captures d'écran",
+    "close": "Fermer",
+    "prev": "Capture précédente",
+    "next": "Capture suivante",
+    "zoom": "Agrandir la capture",
+    "unzoom": "Réduire la capture",
+    "position": "{n} sur {total}",
+    "noShots": "Les captures de ce projet arrivent bientôt."
   },
   "Contact": {
     "eyebrow": "Contact",

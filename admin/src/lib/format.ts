@@ -1,4 +1,4 @@
-import type { Locale, ProjectCategory, SkillCategory, SocialKey } from './types';
+import type { Locale, ProjectCategory, ProjectContext, ProjectStatus, SkillCategory, SocialKey } from './types';
 
 export function plural(n: number, one: string, many: string) {
   return `${n} ${n > 1 ? many : one}`;
@@ -63,6 +63,22 @@ export const PROJECT_CATEGORIES: Record<ProjectCategory, { label: string; hint: 
   desktop: { label: 'Logiciel', hint: 'Programme installé sur un ordinateur.' },
 };
 export const PROJECT_ORDER: ProjectCategory[] = ['web', 'mobile', 'desktop'];
+
+export const PROJECT_STATUS: Record<ProjectStatus, { label: string; hint: string; pill: string }> = {
+  live: { label: 'En ligne', hint: 'Le projet est accessible : pense au lien « Site en ligne ».', pill: 'pill-ok' },
+  completed: { label: 'Terminé', hint: 'Fini, mais pas (encore) en ligne.', pill: 'pill-violet' },
+  coming_soon: { label: 'Bientôt en ligne', hint: 'Presque prêt, le lancement approche.', pill: 'pill-accent' },
+  in_progress: { label: 'En cours', hint: 'Encore en développement.', pill: 'pill-off' },
+};
+export const STATUS_ORDER: ProjectStatus[] = ['live', 'completed', 'coming_soon', 'in_progress'];
+
+export const PROJECT_CONTEXT: Record<ProjectContext, string> = {
+  client: 'Mission client',
+  personal: 'Projet perso',
+  academic: "Projet d'études",
+  internship: 'Stage',
+};
+export const CONTEXT_ORDER: ProjectContext[] = ['client', 'personal', 'academic', 'internship'];
 
 // ─── Réseaux sociaux (tous facultatifs) ─────────────────────────────────────
 

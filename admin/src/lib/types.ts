@@ -3,6 +3,8 @@
 export type Locale = 'fr' | 'en' | 'es' | 'ar';
 export type SkillCategory = 'frontend' | 'backend' | 'mobile' | 'tools';
 export type ProjectCategory = 'web' | 'mobile' | 'desktop';
+export type ProjectStatus = 'live' | 'completed' | 'coming_soon' | 'in_progress';
+export type ProjectContext = 'client' | 'personal' | 'academic' | 'internship';
 export type SocialKey = 'github' | 'linkedin' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'behance' | 'dribbble';
 
 export interface Me {
@@ -121,12 +123,31 @@ export interface Project {
   titleEn: string | null;
   titleEs: string | null;
   titleAr: string | null;
+  /** Une ou deux phrases pour la carte. */
+  summary: string;
+  summaryEn: string | null;
+  summaryEs: string | null;
+  summaryAr: string | null;
   description: string;
   descriptionEn: string | null;
   descriptionEs: string | null;
   descriptionAr: string | null;
-  category: ProjectCategory;
+  /** Une fonctionnalité / un point fort par ligne. */
+  features: string;
+  featuresEn: string | null;
+  featuresEs: string | null;
+  featuresAr: string | null;
+  highlights: string;
+  highlightsEn: string | null;
+  highlightsEs: string | null;
+  highlightsAr: string | null;
+  categories: ProjectCategory[];
+  status: ProjectStatus;
+  /** null = non précisé. */
+  context: ProjectContext | null;
+  team: boolean;
   technologies: string[];
+  /** Couverture choisie. null = la 1re photo de la galerie. */
   imageUrl: string | null;
   imagePublicId: string | null;
   /** Lien du site / de l'application en ligne. null = pas de bouton. */
@@ -139,6 +160,40 @@ export interface Project {
   order: number;
   createdAt: string;
   updatedAt: string;
+}
+
+/** Projet tel que la liste de l'admin le renvoie. */
+export interface ProjectListItem extends Project {
+  /** Couverture choisie, sinon 1re photo de la galerie. */
+  coverUrl: string | null;
+  sectionCount: number;
+  imageCount: number;
+}
+
+export interface ProjectImage {
+  id: number;
+  sectionId: number;
+  url: string;
+  publicId: string;
+  width: number;
+  height: number;
+  order: number;
+}
+
+/** Une partie du projet (« Site admin », « App livreurs »…) et sa galerie. */
+export interface ProjectSection {
+  id: number;
+  projectId: number;
+  title: string;
+  titleEn: string | null;
+  titleEs: string | null;
+  titleAr: string | null;
+  subtitle: string | null;
+  subtitleEn: string | null;
+  subtitleEs: string | null;
+  subtitleAr: string | null;
+  order: number;
+  images: ProjectImage[];
 }
 
 export interface Message {

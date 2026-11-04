@@ -6,6 +6,7 @@ import "../globals.css";
 import { Scene } from "@/components/scene";
 import { SiteNav } from "@/components/site-nav";
 import { Reveal } from "@/components/reveal";
+import { ThemeScript } from "@/components/theme-script";
 import { routing } from "@/i18n/routing";
 import { getPortfolio, type Locale } from "@/lib/api";
 import { BRAND_INITIALS, LOCALE_TAGS, OG_LOCALES, SITE_URL } from "@/lib/site";
@@ -48,9 +49,6 @@ export async function generateMetadata({
   };
 }
 
-/* Le thème est posé avant le premier rendu : pas de clignotement. */
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`;
-
 export default async function LocaleLayout({
   children,
   params,
@@ -80,10 +78,7 @@ export default async function LocaleLayout({
           href="https://fonts.gstatic.com"
           crossOrigin=""
         />
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
-        />
+        <ThemeScript />
       </head>
       <body>
         <NextIntlClientProvider>

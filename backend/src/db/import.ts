@@ -236,14 +236,17 @@ async function importProjects(db: Database, rows: Row[]) {
   for (const [i, row] of rows.entries()) {
     const title = str(row, 'title');
     if (!title) continue;
-    const category = str(row, 'category') ?? 'web';
-    if (!(projectCategory.enumValues as readonly string[]).includes(category)) {
-      throw new Error(`projet « ${title} » : catégorie « ${category} » inconnue (web, mobile ou desktop)`);
+    const categories = list(row, 'categories');
+    if (!categories.length) categories.push(str(row, 'category') ?? 'web');
+    for (const category of categories) {
+      if (!(projectCategory.enumValues as readonly string[]).includes(category)) {
+        throw new Error(`projet « ${title} » : catégorie « ${category} » inconnue (web, mobile ou desktop)`);
+      }
     }
     const values = {
       ...translated(row, 'title', 'title'),
       ...translated(row, 'description', 'description'),
-      category: category as ProjectCategory,
+      categories: categories as ProjectCategory[],
       technologies: list(row, 'technologies'),
       imageUrl: str(row, 'image_url'),
       imagePublicId: str(row, 'image_public_id'),

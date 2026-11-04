@@ -3,6 +3,8 @@ import { PartialType } from '@nestjs/mapped-types';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
+  ArrayMinSize,
+  ArrayUnique,
   IsArray,
   IsBoolean,
   IsIn,
@@ -14,7 +16,16 @@ import {
   MaxLength,
   ValidateIf,
 } from 'class-validator';
-import { projectCategory, ProjectCategory, skillCategory, SkillCategory } from '../db/schema';
+import {
+  projectCategory,
+  ProjectCategory,
+  projectContext,
+  ProjectContext,
+  projectStatus,
+  ProjectStatus,
+  skillCategory,
+  SkillCategory,
+} from '../db/schema';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : value);
 const trimKeepLines = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
@@ -211,18 +222,70 @@ export class CreateProjectDto {
   @Traduction(160) titleEs?: string | null;
   @Traduction(160) titleAr?: string | null;
 
+  /** Une ou deux phrases pour la carte. */
+  @IsOptional()
+  @Transform(trimKeepLines)
+  @IsString()
+  @MaxLength(400)
+  summary?: string;
+
+  @Traduction(400) summaryEn?: string | null;
+  @Traduction(400) summaryEs?: string | null;
+  @Traduction(400) summaryAr?: string | null;
+
+  @IsOptional()
+  @Transform(trimKeepLines)
+  @IsString()
+  @MaxLength(6000)
+  description?: string;
+
+  @Traduction(6000) descriptionEn?: string | null;
+  @Traduction(6000) descriptionEs?: string | null;
+  @Traduction(6000) descriptionAr?: string | null;
+
+  /** Fonctionnalités clés, une par ligne. */
   @IsOptional()
   @Transform(trimKeepLines)
   @IsString()
   @MaxLength(4000)
-  description?: string;
+  features?: string;
 
-  @Traduction(4000) descriptionEn?: string | null;
-  @Traduction(4000) descriptionEs?: string | null;
-  @Traduction(4000) descriptionAr?: string | null;
+  @Traduction(4000) featuresEn?: string | null;
+  @Traduction(4000) featuresEs?: string | null;
+  @Traduction(4000) featuresAr?: string | null;
 
-  @IsIn(projectCategory.enumValues, { message: 'Catégorie inconnue : web, mobile ou desktop' })
-  category: ProjectCategory;
+  /** Points forts techniques, un par ligne. */
+  @IsOptional()
+  @Transform(trimKeepLines)
+  @IsString()
+  @MaxLength(4000)
+  highlights?: string;
+
+  @Traduction(4000) highlightsEn?: string | null;
+  @Traduction(4000) highlightsEs?: string | null;
+  @Traduction(4000) highlightsAr?: string | null;
+
+  /** Au moins une : ['web'], ['web', 'mobile']… */
+  @IsArray({ message: 'Choisis au moins une catégorie' })
+  @ArrayMinSize(1, { message: 'Choisis au moins une catégorie' })
+  @ArrayUnique()
+  @IsIn(projectCategory.enumValues, { each: true, message: 'Catégorie inconnue : web, mobile ou desktop' })
+  categories: ProjectCategory[];
+
+  @IsOptional()
+  @IsIn(projectStatus.enumValues, { message: 'Statut inconnu' })
+  status?: ProjectStatus;
+
+  /** NULL = non précisé. */
+  @IsOptional()
+  @Transform(emptyToNull)
+  @ValidateIf((_, v) => v !== null)
+  @IsIn(projectContext.enumValues, { message: 'Contexte inconnu' })
+  context?: ProjectContext | null;
+
+  @IsOptional()
+  @IsBoolean()
+  team?: boolean;
 
   @Technologies() technologies?: string[];
 
@@ -250,6 +313,42 @@ export class CreateProjectDto {
 }
 
 export class UpdateProjectDto extends PartialType(CreateProjectDto) {}
+
+/** Une partie du projet : « Site admin », « App livreurs »… */
+export class CreateSectionDto {
+  @Transform(trim)
+  @IsString()
+  @IsNotEmpty({ message: 'Donne un nom à cette partie' })
+  @MaxLength(120)
+  title: string;
+
+  @Traduction(120) titleEn?: string | null;
+  @Traduction(120) titleEs?: string | null;
+  @Traduction(120) titleAr?: string | null;
+
+  @IsOptional()
+  @Transform(emptyToNull)
+  @ValidateIf((_, v) => v !== null)
+  @IsString()
+  @MaxLength(200)
+  subtitle?: string | null;
+
+  @Traduction(200) subtitleEn?: string | null;
+  @Traduction(200) subtitleEs?: string | null;
+  @Traduction(200) subtitleAr?: string | null;
+}
+
+export class UpdateSectionDto extends PartialType(CreateSectionDto) {}
+
+/** Photos déjà envoyées par /admin/uploads, à ranger dans une partie : { publicIds: ['local:project-….webp'] } */
+export class AddImagesDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(100, { message: '100 photos maximum par envoi' })
+  @IsString({ each: true })
+  @MaxLength(300, { each: true })
+  publicIds: string[];
+}
 
 /** ?category=web&filter=visible|masque|featured */
 export class AdminProjectQuery {

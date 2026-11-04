@@ -76,7 +76,40 @@
     "emptyText": "Estoy preparando la presentación de mis trabajos. Cada proyecto se publicará aquí con su stack técnico, sus capturas y sus enlaces.",
     "emptyCta": "Hablar de tu proyecto",
     "ctaLive": "Ver en línea",
-    "ctaCode": "Código"
+    "ctaCode": "Código",
+    "ctaDetails": "Ver el proyecto",
+    "team": "Proyecto en equipo",
+    "status": {
+      "live": "En línea",
+      "completed": "Terminado",
+      "coming_soon": "Próximamente",
+      "in_progress": "En curso"
+    },
+    "context": {
+      "client": "Proyecto para cliente",
+      "personal": "Proyecto personal",
+      "academic": "Proyecto académico",
+      "internship": "Prácticas"
+    },
+    "categories": {
+      "web": "Web",
+      "mobile": "Móvil",
+      "desktop": "Escritorio"
+    },
+    "shots": "{count, plural, one {# captura} other {# capturas}}",
+    "partsCount": "{count, plural, one {# parte} other {# partes}}",
+    "parts": "Partes del proyecto",
+    "features": "Funcionalidades clave",
+    "highlights": "Puntos fuertes técnicos",
+    "stack": "Tecnologías",
+    "gallery": "Capturas de pantalla",
+    "close": "Cerrar",
+    "prev": "Captura anterior",
+    "next": "Captura siguiente",
+    "zoom": "Ampliar la captura",
+    "unzoom": "Reducir la captura",
+    "position": "{n} de {total}",
+    "noShots": "Las capturas de este proyecto llegarán pronto."
   },
   "Contact": {
     "eyebrow": "Contacto",

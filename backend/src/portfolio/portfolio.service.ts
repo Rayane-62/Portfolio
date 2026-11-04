@@ -4,9 +4,17 @@ import { socialUrl, waNumber } from '../common/text';
 import { skillCategory, SOCIAL_KEYS, type SocialKey } from '../db/schema';
 import { EducationsService } from '../content/educations.service';
 import { ExperiencesService } from '../content/experiences.service';
-import { ProjectsService } from '../content/projects.service';
+import { coverOf, ProjectsService } from '../content/projects.service';
 import { SkillsService } from '../content/skills.service';
 import { InfoService } from './info.service';
+
+/** « - Une ligne⏎• Une autre » → ['Une ligne', 'Une autre'] */
+function lines(text: string | null): string[] {
+  return (text ?? '')
+    .split('\n')
+    .map((l) => l.replace(/^\s*[-•*]\s*/, '').trim())
+    .filter(Boolean);
+}
 
 /** Tout ce dont le site a besoin pour s'afficher, dans la langue demandée. */
 @Injectable()
@@ -75,17 +83,37 @@ export class PortfolioService {
         description: tr(e, 'description', locale),
         current: e.current,
       })),
-      projects: projectRows.map((p) => ({
-        id: p.id,
-        title: tr(p, 'title', locale),
-        description: tr(p, 'description', locale),
-        category: p.category,
-        technologies: p.technologies,
-        imageUrl: p.imageUrl,
-        liveUrl: p.liveUrl,
-        githubUrl: p.githubUrl,
-        featured: p.featured,
-      })),
+      projects: projectRows.map((p) => {
+        const description = tr(p, 'description', locale);
+        return {
+          id: p.id,
+          title: tr(p, 'title', locale),
+          // Pas de résumé : la carte reprend le 1er paragraphe de la description.
+          summary: tr(p, 'summary', locale) ?? description?.split(/\n\s*\n/)[0] ?? null,
+          description,
+          features: lines(tr(p, 'features', locale)),
+          highlights: lines(tr(p, 'highlights', locale)),
+          categories: p.categories,
+          status: p.status,
+          context: p.context,
+          team: p.team,
+          technologies: p.technologies,
+          coverUrl: coverOf(p.imageUrl, p.sections),
+          liveUrl: p.liveUrl,
+          githubUrl: p.githubUrl,
+          featured: p.featured,
+          sections: p.sections
+            .filter((s) => s.images.length)
+            .map((s) => ({
+              id: s.id,
+              title: tr(s, 'title', locale),
+              subtitle: tr(s, 'subtitle', locale),
+              images: s.images.map((img) => ({ id: img.id, url: img.url, width: img.width, height: img.height })),
+            })),
+          // Les parties sans photo restent listées dans « Parties du projet ».
+          parts: p.sections.map((s) => ({ title: tr(s, 'title', locale), subtitle: tr(s, 'subtitle', locale) })),
+        };
+      }),
     };
   }
 }

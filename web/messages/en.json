@@ -76,7 +76,40 @@
     "emptyText": "I'm putting together the write-ups of my work. Each project will be published here with its tech stack, screenshots and links.",
     "emptyCta": "Tell me about your project",
     "ctaLive": "View live",
-    "ctaCode": "Code"
+    "ctaCode": "Code",
+    "ctaDetails": "View project",
+    "team": "Team project",
+    "status": {
+      "live": "Live",
+      "completed": "Completed",
+      "coming_soon": "Coming soon",
+      "in_progress": "In progress"
+    },
+    "context": {
+      "client": "Client work",
+      "personal": "Personal project",
+      "academic": "Academic project",
+      "internship": "Internship"
+    },
+    "categories": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "desktop": "Desktop"
+    },
+    "shots": "{count, plural, one {# screenshot} other {# screenshots}}",
+    "partsCount": "{count, plural, one {# part} other {# parts}}",
+    "parts": "Project parts",
+    "features": "Key features",
+    "highlights": "Technical highlights",
+    "stack": "Tech stack",
+    "gallery": "Screenshots",
+    "close": "Close",
+    "prev": "Previous screenshot",
+    "next": "Next screenshot",
+    "zoom": "Enlarge screenshot",
+    "unzoom": "Shrink screenshot",
+    "position": "{n} of {total}",
+    "noShots": "Screenshots for this project are coming soon."
   },
   "Contact": {
     "eyebrow": "Contact",

@@ -1,15 +1,18 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AdminAuthGuard } from '../auth/admin-auth.guard';
 import {
+  AddImagesDto,
   AdminProjectQuery,
   CreateEducationDto,
   CreateExperienceDto,
   CreateProjectDto,
+  CreateSectionDto,
   CreateSkillDto,
   ReorderDto,
   UpdateEducationDto,
   UpdateExperienceDto,
   UpdateProjectDto,
+  UpdateSectionDto,
   UpdateSkillDto,
   VisibleDto,
 } from './content.dto';
@@ -167,5 +170,60 @@ export class AdminProjectsController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.projects.remove(id);
+  }
+
+  // ─── Parties et galeries : chaque route renvoie la liste à jour des parties ──
+
+  @Get(':id/sections')
+  sections(@Param('id', ParseIntPipe) id: number) {
+    return this.projects.listSections(id);
+  }
+
+  @Post(':id/sections')
+  createSection(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateSectionDto) {
+    return this.projects.createSection(id, dto);
+  }
+
+  @Put(':id/sections/order')
+  reorderSections(@Param('id', ParseIntPipe) id: number, @Body() dto: ReorderDto) {
+    return this.projects.reorderSections(id, dto.ids);
+  }
+
+  @Patch(':id/sections/:sectionId')
+  updateSection(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('sectionId', ParseIntPipe) sectionId: number,
+    @Body() dto: UpdateSectionDto,
+  ) {
+    return this.projects.updateSection(id, sectionId, dto);
+  }
+
+  @Delete(':id/sections/:sectionId')
+  removeSection(@Param('id', ParseIntPipe) id: number, @Param('sectionId', ParseIntPipe) sectionId: number) {
+    return this.projects.removeSection(id, sectionId);
+  }
+
+  /** Photos envoyées au préalable par /admin/uploads?kind=project : { publicIds: [...] } */
+  @Post(':id/sections/:sectionId/images')
+  addImages(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('sectionId', ParseIntPipe) sectionId: number,
+    @Body() dto: AddImagesDto,
+  ) {
+    return this.projects.addImages(id, sectionId, dto.publicIds);
+  }
+
+  @Put(':id/sections/:sectionId/images/order')
+  reorderImages(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('sectionId', ParseIntPipe) sectionId: number,
+    @Body() dto: ReorderDto,
+  ) {
+    return this.projects.reorderImages(id, sectionId, dto.ids);
+  }
+
+  @Delete(':id/images/:imageId')
+  removeImage(@Param('id', ParseIntPipe) id: number, @Param('imageId', ParseIntPipe) imageId: number) {
+    return this.projects.removeImage(id, imageId);
   }
 }

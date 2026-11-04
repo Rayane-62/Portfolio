@@ -2,16 +2,19 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { type ChangeEvent, type DragEvent, type FormEvent, useEffect, useRef, useState } from 'react';
 import { Link, useBlocker, useNavigate, useParams } from 'react-router';
 import { IconClose, IconExternal, IconGithub, IconImage, IconLayers, IconStar, IconTrash } from '@/components/icons';
+import { ProjectGallery } from '@/components/project-gallery';
 import {
   Button, ErrorText, Field, LangNote, LangPicker, LoadError, Loading, PageHeader, SaveBar, Segmented, Spinner, SwitchRow, TechInput, TransField,
 } from '@/components/ui';
 import { api, errMsg, upload } from '@/lib/api';
-import { LOCALES, locField, PROJECT_CATEGORIES, PROJECT_ORDER } from '@/lib/format';
+import {
+  CONTEXT_ORDER, LOCALES, locField, PROJECT_CATEGORIES, PROJECT_CONTEXT, PROJECT_ORDER, PROJECT_STATUS, STATUS_ORDER,
+} from '@/lib/format';
 import { keys, refresh } from '@/lib/queries';
-import type { Locale, Project, ProjectCategory } from '@/lib/types';
+import type { Locale, Project, ProjectCategory, ProjectContext, ProjectStatus } from '@/lib/types';
 import { confirm, toast } from '@/store/ui';
 
-const FIELDS = ['title', 'description'] as const;
+const FIELDS = ['title', 'summary', 'description', 'features', 'highlights'] as const;
 type FieldKey = (typeof FIELDS)[number];
 type Texts = Record<FieldKey, Record<Locale, string>>;
 
@@ -20,7 +23,11 @@ const MAX_IMAGE_MB = 15;
 
 interface FormState {
   texts: Texts;
-  category: ProjectCategory;
+  categories: ProjectCategory[];
+  status: ProjectStatus;
+  /** 'none' = non précisé (null dans l'API). */
+  context: ProjectContext | 'none';
+  team: boolean;
   technologies: string[];
   imageUrl: string | null;
   imagePublicId: string | null;
@@ -32,7 +39,10 @@ interface FormState {
 
 const empty = (): FormState => ({
   texts: Object.fromEntries(FIELDS.map((f) => [f, { fr: '', en: '', es: '', ar: '' }])) as Texts,
-  category: 'web',
+  categories: ['web'],
+  status: 'completed',
+  context: 'none',
+  team: false,
   technologies: [],
   imageUrl: null,
   imagePublicId: null,
@@ -46,7 +56,10 @@ const fromProject = (p: Project): FormState => ({
   texts: Object.fromEntries(
     FIELDS.map((f) => [f, Object.fromEntries(LOCALES.map((l) => [l, (p as unknown as Record<string, string | null>)[locField(f, l)] ?? ''])) as Record<Locale, string>]),
   ) as Texts,
-  category: p.category,
+  categories: p.categories,
+  status: p.status,
+  context: p.context ?? 'none',
+  team: p.team,
   technologies: p.technologies,
   imageUrl: p.imageUrl,
   imagePublicId: p.imagePublicId,
@@ -133,7 +146,10 @@ function ProjectForm({ project }: { project: Project | null }) {
   const save = useMutation({
     mutationFn: () => {
       const json: Record<string, unknown> = {
-        category: f.category,
+        categories: PROJECT_ORDER.filter((c) => f.categories.includes(c)),
+        status: f.status,
+        context: f.context === 'none' ? null : f.context,
+        team: f.team,
         technologies: f.technologies,
         imageUrl: f.imageUrl,
         imagePublicId: f.imagePublicId,
@@ -160,6 +176,7 @@ function ProjectForm({ project }: { project: Project | null }) {
   function submit(e?: FormEvent) {
     e?.preventDefault();
     if (!f.texts.title.fr.trim()) { setLoc('fr'); return setError('Donne un titre au projet (en français).'); }
+    if (!f.categories.length) return setError('Choisis au moins une catégorie (web, mobile ou logiciel).');
     for (const [k, label] of [['liveUrl', 'Le lien du site en ligne'], ['githubUrl', 'Le lien GitHub']] as const) {
       const v = f[k].trim();
       if (v && !/^https?:\/\//.test(v)) return setError(`${label} doit commencer par https://`);
@@ -193,28 +210,81 @@ function ProjectForm({ project }: { project: Project | null }) {
             <LangNote loc={loc} />
             <TransField label="Titre" loc={loc} values={f.texts.title} onChange={setText('title')} maxLength={160} placeholder="Boutique CABA Beauty" />
             <TransField
-              label="Description"
+              label="Résumé (carte)"
+              loc={loc}
+              values={f.texts.summary}
+              onChange={setText('summary')}
+              maxLength={400}
+              rows={2}
+              placeholder="Plateforme de livraison pour l'Algérie : 7 applications reliées à une API unique."
+              hint="1 ou 2 phrases. Vide = le 1er paragraphe de la description."
+            />
+            <TransField
+              label="Description complète"
               loc={loc}
               values={f.texts.description}
               onChange={setText('description')}
+              maxLength={6000}
+              rows={7}
+              placeholder="Le problème, la solution, pour qui. Affichée dans la fenêtre du projet."
+            />
+            <TransField
+              label="Fonctionnalités clés"
+              loc={loc}
+              values={f.texts.features}
+              onChange={setText('features')}
               maxLength={4000}
               rows={6}
-              placeholder="Ce que fait le projet, pour qui, et ce que tu as construit."
+              placeholder={'Paiement à la livraison\nSuivi de commande en temps réel\n4 types de comptes'}
+              hint="Une par ligne. Les tirets en début de ligne sont retirés."
+            />
+            <TransField
+              label="Points forts techniques"
+              loc={loc}
+              values={f.texts.highlights}
+              onChange={setText('highlights')}
+              maxLength={4000}
+              rows={4}
+              placeholder={'Dispatch géolocalisé avec PostGIS\nMonorepo pnpm partagé entre 6 apps'}
+              hint="Un par ligne. Ce qui impressionnerait un recruteur."
             />
           </section>
 
           <section className="panel flex flex-col gap-[18px]">
             <h2 className="panel-title m-0!">Nature du projet</h2>
-            <Field label="Catégorie" hint={PROJECT_CATEGORIES[f.category].hint} as="div">
-              <Segmented value={f.category} onChange={(v) => set('category', v)} label="Catégorie du projet" options={PROJECT_ORDER.map((c) => [c, PROJECT_CATEGORIES[c].label])} />
+            <Field label="Catégories" hint="Une ou plusieurs : un projet peut être à la fois web et mobile." as="div">
+              <div className="seg" role="group" aria-label="Catégories du projet">
+                {PROJECT_ORDER.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    aria-pressed={f.categories.includes(c)}
+                    onClick={() => set('categories', f.categories.includes(c) ? f.categories.filter((x) => x !== c) : [...f.categories, c])}
+                  >
+                    {PROJECT_CATEGORIES[c].label}
+                  </button>
+                ))}
+              </div>
             </Field>
+            <Field label="Statut" hint={PROJECT_STATUS[f.status].hint} as="div">
+              <Segmented value={f.status} onChange={(v) => set('status', v)} label="Statut du projet" options={STATUS_ORDER.map((st) => [st, PROJECT_STATUS[st].label])} />
+            </Field>
+            <Field label="Contexte" hint="Affiché en petit sur la fenêtre du projet. « Non précisé » = rien n'est affiché." as="div">
+              <Segmented
+                value={f.context}
+                onChange={(v) => set('context', v)}
+                label="Contexte du projet"
+                options={[['none', 'Non précisé'], ...CONTEXT_ORDER.map((c) => [c, PROJECT_CONTEXT[c]] as [ProjectContext, string])]}
+              />
+            </Field>
+            <SwitchRow label="Projet en équipe" hint="Ajoute le badge « Projet en équipe » sur la carte." checked={f.team} onChange={(v) => set('team', v)} />
             <Field label="Technologies" as="div">
               <TechInput value={f.technologies} onChange={(v) => set('technologies', v)} suggestions={TECH_SUGGESTIONS} />
             </Field>
           </section>
 
           <section className="panel flex flex-col gap-[18px]">
-            <h2 className="panel-title m-0!">Image</h2>
+            <h2 className="panel-title m-0!">Couverture <span className="label">Facultatif</span></h2>
             {f.imageUrl ? (
               <div className="ph-tile aspect-[16/10] w-full max-w-[420px]">
                 <img src={f.imageUrl} alt="" />
@@ -237,7 +307,19 @@ function ProjectForm({ project }: { project: Project | null }) {
               </button>
             )}
             <input ref={fileInput} type="file" accept="image/png,image/webp,image/jpeg,image/avif" hidden onChange={(e: ChangeEvent<HTMLInputElement>) => { const file = e.target.files?.[0]; e.target.value = ''; addFile(file); }} />
-            <p className="note m-0">L'image est redressée, réduite à 1600 px et convertie en WebP par le serveur : elle reste légère sur le site.</p>
+            <p className="note m-0">Sans couverture, la carte affiche la 1<sup>re</sup> photo de la galerie. Les images sont redressées, réduites à 1600 px et converties en WebP par le serveur.</p>
+          </section>
+
+          <section className="panel flex flex-col gap-[18px]">
+            <h2 className="panel-title m-0!">
+              Galerie
+              <span className="label">Langue des noms : {loc.toUpperCase()}</span>
+            </h2>
+            {project ? (
+              <ProjectGallery projectId={project.id} loc={loc} coverChosen={!!f.imageUrl} />
+            ) : (
+              <p className="note m-0">Ajoute d'abord le projet : la galerie (parties et photos) se remplit ensuite, depuis cette page.</p>
+            )}
           </section>
 
           <section className="panel grid grid-cols-2 gap-3.5 max-sm:grid-cols-1">
@@ -266,7 +348,7 @@ function ProjectForm({ project }: { project: Project | null }) {
                 variant="bad"
                 className="ml-auto"
                 onClick={async () => {
-                  if (await confirm({ title: 'Supprimer ce projet ?', message: `« ${project.title} » et son image seront définitivement supprimés.`, confirmLabel: 'Supprimer', danger: true })) {
+                  if (await confirm({ title: 'Supprimer ce projet ?', message: `« ${project.title} », sa galerie et toutes ses photos seront définitivement supprimés.`, confirmLabel: 'Supprimer', danger: true })) {
                     try {
                       await api(`/admin/projects/${project.id}`, { method: 'DELETE' });
                       refresh(keys.projects);
@@ -294,10 +376,14 @@ function ProjectForm({ project }: { project: Project | null }) {
               {f.featured && <span className="pill pill-accent absolute top-2.5 left-2.5 bg-bg/70"><IconStar size={11} /> En avant</span>}
             </div>
             <div className={`flex flex-col gap-2 p-4 ${loc === 'ar' ? 'ar' : ''}`}>
-              <span className="label">{PROJECT_CATEGORIES[f.category].label}</span>
+              <span className="flex flex-wrap items-center gap-1.5">
+                <span className={`pill ${PROJECT_STATUS[f.status].pill}`}>{PROJECT_STATUS[f.status].label}</span>
+                {f.team && <span className="pill">Équipe</span>}
+                <span className="label">{PROJECT_ORDER.filter((c) => f.categories.includes(c)).map((c) => PROJECT_CATEGORIES[c].label).join(' · ')}</span>
+              </span>
               <b className="display text-[17px] break-words">{title || 'Titre du projet'}</b>
               <p className="m-0 line-clamp-3 text-[13px] leading-relaxed text-muted">
-                {f.texts.description[loc].trim() || f.texts.description.fr.trim() || 'La description apparaîtra ici.'}
+                {f.texts.summary[loc].trim() || f.texts.summary.fr.trim() || (f.texts.description[loc].trim() || f.texts.description.fr.trim()).split(/\n\s*\n/)[0] || 'Le résumé apparaîtra ici.'}
               </p>
               {f.technologies.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">

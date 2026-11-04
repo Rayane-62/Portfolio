@@ -202,15 +202,24 @@ async function main() {
   const proj = await call('POST', '/admin/projects', {
     title: 'Smoke Boutique', titleEn: 'Smoke Shop', titleAr: 'متجر سموك',
     description: 'Site e-commerce de test.', descriptionEn: 'Test e-commerce site.',
-    category: 'web', technologies: ['Next.js', 'NestJS'], liveUrl: 'https://smoke.example.com',
+    summary: 'Boutique de test.', features: '- Panier\n- Paiement à la livraison\n\n', highlights: 'Rapide',
+    categories: ['web', 'mobile'], status: 'coming_soon', context: 'client', team: true,
+    technologies: ['Next.js', 'NestJS'], liveUrl: 'https://smoke.example.com',
     githubUrl: 'https://github.com/Rayane-62/smoke', featured: true,
   });
-  check('création projet', proj.status === 201 && proj.data.category === 'web' && proj.data.visible === true, proj.data);
-  check('catégorie inconnue refusée (400)', (await call('POST', '/admin/projects', { title: 'X', category: 'jeu' })).status === 400);
-  check('titre vide refusé (400)', (await call('POST', '/admin/projects', { title: '  ', category: 'web' })).status === 400);
-  check('lien sans https refusé (400)', (await call('POST', '/admin/projects', { title: 'X', category: 'web', liveUrl: 'smoke.example.com' })).status === 400);
-  const proj2 = await call('POST', '/admin/projects', { title: 'Smoke Appli', category: 'mobile', technologies: ['Kotlin'] });
-  check('2e projet (mobile)', proj2.status === 201 && proj2.data.category === 'mobile', proj2.data);
+  check('création projet (web + mobile)', proj.status === 201 && proj.data.categories.join() === 'web,mobile' && proj.data.visible === true, proj.data);
+  check('statut, contexte et équipe enregistrés', proj.data.status === 'coming_soon' && proj.data.context === 'client' && proj.data.team === true, proj.data);
+  check('catégorie inconnue refusée (400)', (await call('POST', '/admin/projects', { title: 'X', categories: ['jeu'] })).status === 400);
+  check('aucune catégorie refusée (400)', (await call('POST', '/admin/projects', { title: 'X', categories: [] })).status === 400);
+  check('statut inconnu refusé (400)', (await call('POST', '/admin/projects', { title: 'X', categories: ['web'], status: 'fini' })).status === 400);
+  check('titre vide refusé (400)', (await call('POST', '/admin/projects', { title: '  ', categories: ['web'] })).status === 400);
+  check('lien sans https refusé (400)', (await call('POST', '/admin/projects', { title: 'X', categories: ['web'], liveUrl: 'smoke.example.com' })).status === 400);
+  const proj2 = await call('POST', '/admin/projects', { title: 'Smoke Appli', categories: ['mobile'], technologies: ['Kotlin'], description: 'Premier paragraphe.\n\nSuite.' });
+  check('2e projet (mobile, statut par défaut « terminé »)', proj2.status === 201 && proj2.data.categories.join() === 'mobile' && proj2.data.status === 'completed' && proj2.data.context === null, proj2.data);
+  const pubSmoke = (await call('GET', '/public/portfolio?locale=fr', null, false)).data.projects;
+  const pubP1 = pubSmoke.find((p) => p.id === proj.data.id);
+  check('site : fonctionnalités découpées par ligne', JSON.stringify(pubP1?.features) === '["Panier","Paiement à la livraison"]', pubP1?.features);
+  check('site : sans résumé, 1er paragraphe de la description', pubSmoke.find((p) => p.id === proj2.data.id)?.summary === 'Premier paragraphe.', pubSmoke.map((p) => p.summary));
   const pubProj = (await call('GET', '/public/portfolio?locale=en', null, false)).data.projects;
   check('projets visibles sur le site, mis en avant d’abord', pubProj[0].title === 'Smoke Shop' && pubProj.length === 2, pubProj.map((p) => p.title));
   check('projet traduit (arabe) avec repli', (await call('GET', '/public/portfolio?locale=ar', null, false)).data.projects.find((p) => p.id === proj.data.id)?.title === 'متجر سموك');
@@ -218,7 +227,7 @@ async function main() {
   check('masquer un projet', hidden.data.visible === false && (await call('GET', '/public/portfolio', null, false)).data.projects.length === 1);
   check('masqué : toujours dans l’admin', (await call('GET', '/admin/projects?filter=masque')).data.length === 1);
   await call('PATCH', `/admin/projects/${proj2.data.id}/visible`, { visible: true });
-  check('filtre par catégorie', (await call('GET', '/admin/projects?category=mobile')).data.length === 1);
+  check('filtre par catégorie (un projet web + mobile compte dans les deux)', (await call('GET', '/admin/projects?category=mobile')).data.length === 2 && (await call('GET', '/admin/projects?category=web')).data.length === 1);
   const projIds = (await call('GET', '/admin/projects')).data.map((p) => p.id);
   const projOrder = await call('PUT', '/admin/projects/order', { ids: [...projIds].reverse() });
   check('réordonner les projets', projOrder.data[0].id === projIds[projIds.length - 1], projOrder.data.map((p) => p.id));
@@ -307,6 +316,42 @@ async function main() {
   check('le site reçoit la photo et le CV', pubFiles.photoUrl === photo.data.url && pubFiles.cvUrl === cv.data.url, pubFiles.photoUrl);
   const projImg = await call('PATCH', `/admin/projects/${proj.data.id}`, { imageUrl: img.data.url, imagePublicId: img.data.publicId });
   check('image attachée au projet', projImg.data.imageUrl === img.data.url);
+
+  console.log('\nGaleries des projets');
+  check('envoi : dimensions renvoyées', img.data.width === 1600 && img.data.height === 1200, img.data);
+  const sec1 = await call('POST', `/admin/projects/${proj.data.id}/sections`, { title: 'Site admin', titleEn: 'Admin website', subtitle: 'Back-office' });
+  check('partie créée', sec1.status === 201 && sec1.data.length === 1 && sec1.data[0].title === 'Site admin', sec1.data);
+  const sec2 = await call('POST', `/admin/projects/${proj.data.id}/sections`, { title: 'App livreurs' });
+  const [s1, s2] = sec2.data;
+  check('2e partie à la suite', sec2.data.length === 2 && s2.title === 'App livreurs', sec2.data);
+  check('partie sans nom refusée (400)', (await call('POST', `/admin/projects/${proj.data.id}/sections`, { title: ' ' })).status === 400);
+  const portrait = await sharp({ create: { width: 900, height: 1950, channels: 3, background: '#7744ff' } }).png().toBuffer();
+  const shots = [];
+  for (const buf of [png, portrait, png]) shots.push((await call('POST', '/admin/uploads?kind=project', null, true, upload(buf, 'image/png', 'shot.png'))).data);
+  const added = await call('POST', `/admin/projects/${proj.data.id}/sections/${s2.id}/images`, { publicIds: shots.map((x) => x.publicId) });
+  const imgs = added.data.find((s) => s.id === s2.id).images;
+  check('3 photos ajoutées dans l\'ordre', added.status === 201 && imgs.length === 3 && imgs[0].publicId === shots[0].publicId, added.data);
+  check('photo portrait : dimensions lues par le serveur', imgs[1].height > imgs[1].width, imgs[1]);
+  check('même photo deux fois refusée (400)', (await call('POST', `/admin/projects/${proj.data.id}/sections/${s1.id}/images`, { publicIds: [shots[0].publicId] })).status === 400);
+  check('photo inconnue refusée (400)', (await call('POST', `/admin/projects/${proj.data.id}/sections/${s1.id}/images`, { publicIds: ['local:../../etc/passwd'] })).status === 400);
+  check('partie d\'un autre projet refusée (404)', (await call('POST', `/admin/projects/${proj2.data.id}/sections/${s2.id}/images`, { publicIds: [shots[0].publicId] })).status === 404);
+  const imgOrder = await call('PUT', `/admin/projects/${proj.data.id}/sections/${s2.id}/images/order`, { ids: imgs.map((i) => i.id).reverse() });
+  check('réordonner les photos', imgOrder.data.find((s) => s.id === s2.id).images[0].id === imgs[2].id);
+  const secOrder = await call('PUT', `/admin/projects/${proj.data.id}/sections/order`, { ids: [s2.id, s1.id] });
+  check('réordonner les parties', secOrder.data[0].id === s2.id);
+  const renamed = await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { subtitle: '' });
+  check('sous-titre vidé = NULL', renamed.data.find((s) => s.id === s1.id).subtitle === null);
+  const pubGal = (await call('GET', '/public/portfolio?locale=en', null, false)).data.projects.find((p) => p.id === proj.data.id);
+  check('site : seules les parties avec photos ont un onglet', pubGal.sections.length === 1 && pubGal.sections[0].images.length === 3, pubGal.sections);
+  check('site : toutes les parties sont listées, traduites', pubGal.parts.map((x) => x.title).join() === 'App livreurs,Admin website', pubGal.parts);
+  check('site : couverture = image choisie', pubGal.coverUrl === img.data.url);
+  const delImg = await call('DELETE', `/admin/projects/${proj.data.id}/images/${imgs[0].id}`);
+  check('supprimer une photo (fichier compris)', delImg.status === 200 && (await fetch(shots[0].url)).status === 404);
+  check('photo d\'un autre projet refusée (404)', (await call('DELETE', `/admin/projects/${proj2.data.id}/images/${imgs[1].id}`)).status === 404);
+  await call('DELETE', `/admin/projects/${proj.data.id}/sections/${s2.id}`);
+  check('supprimer une partie (ses photos aussi)', (await fetch(shots[1].url)).status === 404 && (await fetch(shots[2].url)).status === 404);
+  const lastShot = (await call('POST', '/admin/uploads?kind=project', null, true, upload(png, 'image/png', 'shot.png'))).data;
+  await call('POST', `/admin/projects/${proj.data.id}/sections/${s1.id}/images`, { publicIds: [lastShot.publicId] });
   await call('PATCH', '/admin/info', { photoUrl: null, photoPublicId: null, cvUrl: null, cvPublicId: null });
   check('photo retirée = fichier supprimé', (await fetch(photo.data.url)).status === 404);
   check('CV retiré = fichier supprimé', (await fetch(cv.data.url)).status === 404);
@@ -335,6 +380,7 @@ async function main() {
   check('messages de test supprimés', (await call('GET', '/admin/messages?limit=200')).data.items.filter((m) => m.name === 'Smoke Visiteur').length === 0);
   check('supprimer le projet (son image aussi)', (await call('DELETE', `/admin/projects/${proj.data.id}`)).status === 200);
   check('image du projet supprimée du serveur', (await fetch(img.data.url)).status === 404);
+  check('photos de la galerie supprimées avec le projet', (await fetch(lastShot.url)).status === 404);
   await call('DELETE', `/admin/projects/${proj2.data.id}`);
   check('tous les projets de test supprimés', (await call('GET', '/admin/projects')).data.length === 0);
   check('supprimer la compétence', (await call('DELETE', `/admin/skills/${skill.data.id}`)).status === 200);

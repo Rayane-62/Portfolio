@@ -3,10 +3,10 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { IconEdit, IconExternal, IconGithub, IconLayers, IconPlus, IconStar } from '@/components/icons';
 import { Button, DeleteButton, Empty, LoadError, Loading, OrderButtons, PageHeader, Switch } from '@/components/ui';
 import { api, errMsg } from '@/lib/api';
-import { plural, PROJECT_CATEGORIES, PROJECT_ORDER } from '@/lib/format';
+import { plural, PROJECT_CATEGORIES, PROJECT_ORDER, PROJECT_STATUS } from '@/lib/format';
 import { keys, queryClient, refresh } from '@/lib/queries';
 import { movedIds, useReorder } from '@/lib/reorder';
-import type { Project, ProjectCategory } from '@/lib/types';
+import type { Project, ProjectCategory, ProjectListItem } from '@/lib/types';
 import { confirm, toast } from '@/store/ui';
 
 const FILTERS = [['all', 'Tous'], ['visible', 'Affichés'], ['masque', 'Masqués'], ['featured', 'En avant']] as const;
@@ -20,15 +20,15 @@ export function ProjectsPage() {
   const cat = PROJECT_ORDER.includes(rawCat as ProjectCategory) ? (rawCat as ProjectCategory) : '';
 
   // On charge la liste complète : c'est elle qui porte l'ordre d'affichage du site.
-  const q = useQuery({ queryKey: keys.projects, queryFn: () => api<Project[]>('/admin/projects') });
+  const q = useQuery({ queryKey: keys.projects, queryFn: () => api<ProjectListItem[]>('/admin/projects') });
   const all = q.data ?? [];
   const list = all.filter(
     (p) =>
       (filter === 'all' || (filter === 'visible' && p.visible) || (filter === 'masque' && !p.visible) || (filter === 'featured' && p.featured)) &&
-      (!cat || p.category === cat),
+      (!cat || p.categories.includes(cat)),
   );
 
-  const reorder = useReorder<Project>('projects', keys.projects);
+  const reorder = useReorder<ProjectListItem>('projects', keys.projects);
   const del = useMutation({
     mutationFn: (id: number) => api(`/admin/projects/${id}`, { method: 'DELETE' }),
     onSuccess: () => { refresh(keys.projects); toast('Projet supprimé'); },
@@ -42,8 +42,8 @@ export function ProjectsPage() {
     setSp(next, { replace: true });
   };
 
-  async function askDelete(p: Project) {
-    if (await confirm({ title: 'Supprimer ce projet ?', message: `« ${p.title} » et son image seront définitivement supprimés.`, confirmLabel: 'Supprimer', danger: true })) del.mutate(p.id);
+  async function askDelete(p: ProjectListItem) {
+    if (await confirm({ title: 'Supprimer ce projet ?', message: `« ${p.title} » sa galerie et toutes ses photos seront définitivement supprimés.`, confirmLabel: 'Supprimer', danger: true })) del.mutate(p.id);
   }
 
   const counts = (k: Filter) => all.filter((p) => k === 'all' || (k === 'visible' && p.visible) || (k === 'masque' && !p.visible) || (k === 'featured' && p.featured)).length;
@@ -108,13 +108,13 @@ export function ProjectsPage() {
   );
 }
 
-function Row({ p, index, count, busy, onMove, onDelete }: { p: Project; index: number; count: number; busy: boolean; onMove: (d: -1 | 1) => void; onDelete: () => void }) {
+function Row({ p, index, count, busy, onMove, onDelete }: { p: ProjectListItem; index: number; count: number; busy: boolean; onMove: (d: -1 | 1) => void; onDelete: () => void }) {
   const navigate = useNavigate();
   const visible = useMutation({
     mutationFn: (v: boolean) => api<Project>(`/admin/projects/${p.id}/visible`, { method: 'PATCH', json: { visible: v } }),
     onMutate: async (v) => {
       await queryClient.cancelQueries({ queryKey: keys.projects });
-      const prev = queryClient.getQueryData<Project[]>(keys.projects);
+      const prev = queryClient.getQueryData<ProjectListItem[]>(keys.projects);
       if (prev) queryClient.setQueryData(keys.projects, prev.map((x) => (x.id === p.id ? { ...x, visible: v } : x)));
       return { prev };
     },
@@ -127,18 +127,21 @@ function Row({ p, index, count, busy, onMove, onDelete }: { p: Project; index: n
       <div className="flex items-start gap-3.5 max-sm:flex-col">
         <button type="button" onClick={() => navigate(`/projets/${p.id}`)} aria-label={`Modifier ${p.title}`} className="shrink-0 max-sm:w-full">
           <span className="ph-tile block h-[88px] w-[132px] max-sm:h-[150px] max-sm:w-full">
-            {p.imageUrl ? <img src={p.imageUrl} alt="" className="size-full" /> : <span className="grid size-full place-items-center text-line-2"><IconLayers size={26} /></span>}
+            {p.coverUrl ? <img src={p.coverUrl} alt="" className="size-full" /> : <span className="grid size-full place-items-center text-line-2"><IconLayers size={26} /></span>}
           </span>
         </button>
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="pill pill-violet">{PROJECT_CATEGORIES[p.category].label}</span>
+            <span className={`pill ${PROJECT_STATUS[p.status].pill}`}>{PROJECT_STATUS[p.status].label}</span>
+            {PROJECT_ORDER.filter((c) => p.categories.includes(c)).map((c) => <span key={c} className="pill pill-violet">{PROJECT_CATEGORIES[c].label}</span>)}
+            {p.team && <span className="pill">Équipe</span>}
             {p.featured && <span className="pill pill-accent"><IconStar size={11} /> En avant</span>}
             {!p.visible && <span className="pill pill-off"><i />Masqué</span>}
           </div>
           <h2 className="display mt-2 mb-1 text-[19px] break-words">{p.title}</h2>
-          {p.description && <p className="m-0 line-clamp-2 text-sm leading-relaxed text-soft">{p.description}</p>}
+          {(p.summary || p.description) && <p className="m-0 line-clamp-2 text-sm leading-relaxed text-soft">{p.summary || p.description}</p>}
+          <p className="label mt-1.5 mb-0">{p.imageCount ? `${plural(p.sectionCount, 'partie', 'parties')} · ${plural(p.imageCount, 'photo', 'photos')}` : 'Galerie vide'}</p>
           {p.technologies.length > 0 && (
             <div className="mt-2.5 flex flex-wrap gap-2">
               {p.technologies.slice(0, 8).map((t) => <span key={t} className="tech">{t}</span>)}
