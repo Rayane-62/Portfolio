@@ -101,7 +101,10 @@ export class PortfolioService {
           technologies: p.technologies,
           coverUrl: coverOf(p.imageUrl, p.sections),
           liveUrl: p.liveUrl,
-          githubUrl: p.githubUrl,
+          playStoreUrl: p.playStoreUrl,
+          appStoreUrl: p.appStoreUrl,
+          downloadUrl: p.downloadUrl,
+          repos: p.repos,
           featured: p.featured,
           // Galerie simple : seules les parties avec photos ont un onglet. Sous-projets : tous sont affichés.
           sections: p.sections
@@ -117,10 +120,13 @@ export class PortfolioService {
               description: subDescription,
               features: lines(tr(s, 'features', locale)),
               highlights: lines(tr(s, 'highlights', locale)),
-              platforms: s.platforms,
+              kind: s.kind,
               technologies: s.technologies,
               liveUrl: s.liveUrl,
-              githubUrl: s.githubUrl,
+              playStoreUrl: s.playStoreUrl,
+              appStoreUrl: s.appStoreUrl,
+              downloadUrl: s.downloadUrl,
+              repos: s.repos,
               images: s.images.map((img) => ({ id: img.id, url: img.url, width: img.width, height: img.height })),
               };
             }),

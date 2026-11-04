@@ -36,6 +36,20 @@
       "when": 1793805996631,
       "tag": "0004_subproject_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793807560734,
+      "tag": "0005_links_tiktok",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793807563558,
+      "tag": "0006_drop_old_links",
+      "breakpoints": true
     }
   ]
 }

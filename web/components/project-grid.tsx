@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { IconExternal } from "@/components/icons";
 import { ProjectDialog } from "@/components/project-dialog";
+import { ProjectLinks } from "@/components/project-links";
 import { ProjectThumb } from "@/components/project-thumb";
 import type { Project } from "@/lib/api";
 
-const MAX_TAGS = 5;
+const MAX_TAGS = 4;
 
 /** Les cartes de la section Projets ; un clic ouvre la fenêtre de détail. */
 export function ProjectGrid({ projects }: { projects: Project[] }) {
@@ -68,18 +68,7 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
                   <button type="button" className="mini mini-accent" onClick={() => setOpenId(p.id)}>
                     {t("ctaDetails")}
                   </button>
-                  {p.liveUrl && (
-                    <a className="mini" href={p.liveUrl} target="_blank" rel="noopener">
-                      <IconExternal />
-                      {t("ctaLive")}
-                    </a>
-                  )}
-                  {p.githubUrl && (
-                    <a className="mini" href={p.githubUrl} target="_blank" rel="noopener">
-                      <IconExternal />
-                      {t("ctaCode")}
-                    </a>
-                  )}
+                  <ProjectLinks links={p} accent={false} primaryOnly />
                 </div>
               </div>
             </article>

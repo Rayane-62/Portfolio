@@ -3,9 +3,11 @@ import { type DragEvent, useRef, useState } from 'react';
 import { IconClose, IconImage, IconPlus, IconStar } from '@/components/icons';
 import { Button, DeleteButton, ErrorText, Field, LoadError, Loading, OrderButtons, Segmented, Spinner, TechInput, TransField } from '@/components/ui';
 import { api, errMsg, upload } from '@/lib/api';
-import { LOCALES, locField, PLATFORM_LABELS, PLATFORM_ORDER, plural, PROJECT_STATUS, STATUS_ORDER } from '@/lib/format';
+import { ProjectLinks } from '@/components/project-links';
+import { linksError, linksOf, linksPayload, type LinksValue } from '@/lib/links';
+import { LOCALES, locField, plural, PROJECT_CATEGORIES, PROJECT_ORDER, PROJECT_STATUS, STATUS_ORDER } from '@/lib/format';
 import { keys, queryClient, refresh } from '@/lib/queries';
-import type { Locale, Platform, ProjectImage, ProjectSection, ProjectStatus } from '@/lib/types';
+import type { Locale, ProjectCategory, ProjectImage, ProjectSection, ProjectStatus } from '@/lib/types';
 import { confirm, toast } from '@/store/ui';
 
 const MAX_IMAGE_MB = 15;
@@ -17,10 +19,10 @@ interface SectionForm {
   texts: SectionTexts;
   /** 'none' = pas de badge (null dans l'API). */
   status: ProjectStatus | 'none';
-  platforms: Platform[];
+  /** 'none' = type non précisé. */
+  kind: ProjectCategory | 'none';
   technologies: string[];
-  liveUrl: string;
-  githubUrl: string;
+  links: LinksValue;
 }
 
 const sectionsKey = (projectId: number) => [...keys.projects, 'sections', projectId] as const;
@@ -145,10 +147,9 @@ function formOf(s: ProjectSection): SectionForm {
       SECTION_FIELDS.map((f) => [f, Object.fromEntries(LOCALES.map((l) => [l, (s as unknown as Record<string, string | null>)[locField(f, l)] ?? '']))]),
     ) as SectionTexts,
     status: s.status ?? 'none',
-    platforms: s.platforms ?? [],
+    kind: s.kind ?? 'none',
     technologies: s.technologies ?? [],
-    liveUrl: s.liveUrl ?? '',
-    githubUrl: s.githubUrl ?? '',
+    links: linksOf(s),
   };
 }
 
@@ -189,10 +190,10 @@ function SectionCard({
     mutationFn: () => {
       const json: Record<string, unknown> = {
         status: form.status === 'none' ? null : form.status,
-        platforms: PLATFORM_ORDER.filter((p) => form.platforms.includes(p)),
+        kind: form.kind === 'none' ? null : form.kind,
         technologies: form.technologies,
-        liveUrl: form.liveUrl.trim(),
-        githubUrl: form.githubUrl.trim(),
+        // Liens propres à un sous-projet : seulement ceux du type choisi.
+        ...(sub ? linksPayload(form.links, form.kind === 'none' ? [] : [form.kind]) : {}),
       };
       for (const f of SECTION_FIELDS) for (const l of LOCALES) json[locField(f, l)] = texts[f][l].trim();
       return api<ProjectSection[]>(`${base}/sections/${section.id}`, { method: 'PATCH', json });
@@ -307,19 +308,13 @@ function SectionCard({
       {sub && (
         <div className="mt-3 flex flex-col gap-3">
           <TransField label="Résumé (carte)" loc={loc} values={texts.summary} onChange={setText('summary')} maxLength={400} rows={2} placeholder="L'app des livreurs : courses, gains, documents." hint="1 ou 2 phrases. Vide = le 1er paragraphe de la description." />
-          <Field label="Plateformes" as="div">
-            <div className="seg" role="group" aria-label="Plateformes du sous-projet">
-              {PLATFORM_ORDER.map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  aria-pressed={form.platforms.includes(p)}
-                  onClick={() => setField('platforms', form.platforms.includes(p) ? form.platforms.filter((x) => x !== p) : [...form.platforms, p])}
-                >
-                  {PLATFORM_LABELS[p]}
-                </button>
-              ))}
-            </div>
+          <Field label="Type" hint="Le type décide des liens proposés plus bas." as="div">
+            <Segmented
+              value={form.kind}
+              onChange={(v) => setField('kind', v)}
+              label="Type du sous-projet"
+              options={[['none', 'Non précisé'], ...PROJECT_ORDER.map((c) => [c, PROJECT_CATEGORIES[c].label] as [ProjectCategory, string])]}
+            />
           </Field>
           <TransField label="Description" loc={loc} values={texts.description} onChange={setText('description')} maxLength={6000} rows={4} placeholder="Ce que fait ce sous-projet, pour qui." />
           <TransField label="Fonctionnalités clés" loc={loc} values={texts.features} onChange={setText('features')} maxLength={4000} rows={4} placeholder={'Suivi des courses en temps réel\nHistorique des gains'} hint="Facultatif. Une par ligne." />
@@ -327,13 +322,9 @@ function SectionCard({
           <Field label="Technologies" as="div">
             <TechInput value={form.technologies} onChange={(v) => setField('technologies', v)} suggestions={['React Native', 'Expo', 'Next.js', 'React', 'Vite', 'NestJS']} />
           </Field>
-          <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-            <Field label="Lien en ligne">
-              <input className="input" value={form.liveUrl} onChange={(e) => setField('liveUrl', e.target.value)} placeholder="https://…" inputMode="url" maxLength={1000} />
-            </Field>
-            <Field label="Dépôt GitHub">
-              <input className="input" value={form.githubUrl} onChange={(e) => setField('githubUrl', e.target.value)} placeholder="https://github.com/…" inputMode="url" maxLength={1000} />
-            </Field>
+          <div className="flex flex-col gap-2">
+            <span className="label">Liens · vide = pas de bouton</span>
+            <ProjectLinks kinds={form.kind === 'none' ? [] : [form.kind]} value={form.links} onChange={(v) => setField('links', v)} />
           </div>
         </div>
       )}
@@ -344,7 +335,8 @@ function SectionCard({
             loading={save.isPending}
             onClick={() => {
               if (!texts.title.fr.trim()) return setError('Le nom (en français) est obligatoire.');
-              for (const v of [form.liveUrl, form.githubUrl]) if (v.trim() && !/^https?:\/\//.test(v.trim())) return setError('Les liens doivent commencer par https://');
+              const linkErr = linksError(form.links);
+              if (linkErr) return setError(linkErr);
               save.mutate();
             }}
           >

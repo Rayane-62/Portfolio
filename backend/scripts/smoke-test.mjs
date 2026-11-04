@@ -113,8 +113,8 @@ async function main() {
   console.log('\nInformations et réseaux facultatifs');
   const info0 = (await call('GET', '/admin/info')).data;
   check('GET /admin/info : pseudos bruts (pas les liens)', info0.id === 1 && !String(info0.github ?? '').startsWith('http'), info0.github);
-  const vides = await call('PATCH', '/admin/info', { github: '', linkedin: '', instagram: '', facebook: '', x: '', youtube: '', behance: '', dribbble: '' });
-  check('réseau vidé = null en base', vides.status === 200 && ['github', 'linkedin', 'instagram', 'facebook', 'x', 'youtube', 'behance', 'dribbble'].every((k) => vides.data[k] === null), vides.data);
+  const vides = await call('PATCH', '/admin/info', { github: '', linkedin: '', instagram: '', facebook: '', x: '', youtube: '', tiktok: '' });
+  check('réseau vidé = null en base', vides.status === 200 && ['github', 'linkedin', 'instagram', 'facebook', 'x', 'youtube', 'tiktok'].every((k) => vides.data[k] === null), vides.data);
   const social0 = (await call('GET', '/public/portfolio', null, false)).data.info.socials;
   check('réseau vide → null sur le site (bouton masqué)', Object.values(social0).every((v) => v === null), social0);
   const mix = await call('PATCH', '/admin/info', {
@@ -123,15 +123,17 @@ async function main() {
     linkedin: 'rayane-benlalam',                      // pseudo simple
     x: 'https://x.com/rayane_dev?utm_source=site',    // lien avec des paramètres
     youtube: 'https://www.youtube.com/@rayanedev/videos',
-    behance: 'www.behance.net/rayane',
+    tiktok: 'https://www.tiktok.com/@rayane.dev?lang=fr',
   });
+  check('TikTok : lien complet → pseudo gardé', mix.data.tiktok === 'rayane.dev', mix.data.tiktok);
   check('lien complet accepté → pseudo gardé', mix.data.github === 'Rayane-62', mix.data.github);
   check('arobase retirée', mix.data.instagram === 'rayane.dev', mix.data.instagram);
   check('paramètres du lien retirés', mix.data.x === 'rayane_dev', mix.data.x);
   const socialMix = (await call('GET', '/public/portfolio', null, false)).data.info.socials;
   check('le site reçoit des liens complets', socialMix.github === 'https://github.com/Rayane-62' && socialMix.linkedin === 'https://www.linkedin.com/in/rayane-benlalam', socialMix);
   check('chaîne YouTube : « @pseudo »', socialMix.youtube === 'https://www.youtube.com/@rayanedev', socialMix.youtube);
-  check('réseaux non remplis toujours null', socialMix.facebook === null && socialMix.dribbble === null, socialMix);
+  check('TikTok : lien « @pseudo » sur le site', socialMix.tiktok === 'https://www.tiktok.com/@rayane.dev', socialMix.tiktok);
+  check('réseaux non remplis toujours null', socialMix.facebook === null && !('behance' in socialMix) && !('dribbble' in socialMix), socialMix);
   check('e-mail invalide refusé (400)', (await call('PATCH', '/admin/info', { email: 'pas-un-email' })).status === 400);
   check('nom vide refusé (400)', (await call('PATCH', '/admin/info', { name: '   ' })).status === 400);
   check('chiffre négatif refusé (400)', (await call('PATCH', '/admin/info', { statsProjects: -2 })).status === 400);
@@ -205,8 +207,14 @@ async function main() {
     summary: 'Boutique de test.', features: '- Panier\n- Paiement à la livraison\n\n', highlights: 'Rapide',
     categories: ['web', 'mobile'], status: 'coming_soon', context: 'client', team: true,
     technologies: ['Next.js', 'NestJS'], liveUrl: 'https://smoke.example.com',
-    githubUrl: 'https://github.com/Rayane-62/smoke', featured: true,
+    playStoreUrl: 'https://play.google.com/store/apps/details?id=smoke', appStoreUrl: 'https://apps.apple.com/app/id1',
+    repos: [{ label: 'Front', url: 'https://github.com/Rayane-62/front' }, { label: 'Back', url: 'https://github.com/Rayane-62/back' }, { label: '', url: '' }],
+    featured: true,
   });
+  check('2 dépôts gardés, ligne vide retirée', proj.data.repos?.length === 2 && proj.data.repos[1].label === 'Back', proj.data.repos);
+  check('liens Google Play / App Store enregistrés', proj.data.playStoreUrl?.startsWith('https://play.google.com') && proj.data.appStoreUrl?.startsWith('https://apps.apple.com'), proj.data);
+  check('3 dépôts refusés (400)', (await call('POST', '/admin/projects', { title: 'X', categories: ['web'], repos: [1, 2, 3].map((n) => ({ label: `R${n}`, url: `https://github.com/r/${n}` })) })).status === 400);
+  check('dépôt sans https refusé (400)', (await call('POST', '/admin/projects', { title: 'X', categories: ['web'], repos: [{ label: 'Front', url: 'github.com/r' }] })).status === 400);
   check('création projet (web + mobile)', proj.status === 201 && proj.data.categories.join() === 'web,mobile' && proj.data.visible === true, proj.data);
   check('statut, contexte et équipe enregistrés', proj.data.status === 'coming_soon' && proj.data.context === 'client' && proj.data.team === true, proj.data);
   check('catégorie inconnue refusée (400)', (await call('POST', '/admin/projects', { title: 'X', categories: ['jeu'] })).status === 400);
@@ -346,13 +354,14 @@ async function main() {
   check('site : toutes les parties sont listées, traduites', pubGal.parts.map((x) => x.title).join() === 'App livreurs,Admin website', pubGal.parts);
   check('site : couverture = image choisie', pubGal.coverUrl === img.data.url);
   console.log('\nSous-projets');
-  check('plateforme inconnue refusée (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { platforms: ['tv'] })).status === 400);
+  check('plateforme inconnue refusée (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { kind: 'tv' })).status === 400);
   const sub = await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, {
-    description: 'Back-office complet.', features: '- Validation des livreurs\n- Statistiques', platforms: ['web'],
+    description: 'Back-office complet.', features: '- Validation des livreurs\n- Statistiques', kind: 'web',
+    repos: [{ label: 'Admin', url: 'https://github.com/Rayane-62/admin' }],
     summary: 'Le back-office.', status: 'in_progress', highlights: 'Rôles configurables',
     technologies: ['React', 'Vite'], liveUrl: 'https://admin.example.com',
   });
-  check('sous-projet enregistré', sub.status === 200 && sub.data.find((x) => x.id === s1.id).platforms.join() === 'web', sub.data);
+  check('sous-projet enregistré', sub.status === 200 && sub.data.find((x) => x.id === s1.id).kind === 'web', sub.data);
   check('lien du sous-projet sans https refusé (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { liveUrl: 'admin.example.com' })).status === 400);
   await call('PATCH', `/admin/projects/${proj.data.id}`, { hasSubprojects: true });
   const pubSub = (await call('GET', '/public/portfolio?locale=fr', null, false)).data.projects.find((p) => p.id === proj.data.id);
@@ -360,7 +369,7 @@ async function main() {
   check('site : avec sous-projets, toutes les parties sont affichées (même sans photo)', pubSub.hasSubprojects === true && pubSub.sections.length === 2, pubSub.sections.map((x) => x.title));
   check('site : résumé, statut et points forts du sous-projet', s1Pub?.summary === 'Le back-office.' && s1Pub.status === 'in_progress' && JSON.stringify(s1Pub.highlights) === '["Rôles configurables"]', s1Pub);
   check('statut de sous-projet inconnu refusé (400)', (await call('PATCH', `/admin/projects/${proj.data.id}/sections/${s1.id}`, { status: 'fini' })).status === 400);
-  check('site : détail du sous-projet', s1Pub?.description === 'Back-office complet.' && JSON.stringify(s1Pub.features) === '["Validation des livreurs","Statistiques"]' && s1Pub.technologies.length === 2 && s1Pub.liveUrl === 'https://admin.example.com', s1Pub);
+  check('site : détail du sous-projet', s1Pub?.description === 'Back-office complet.' && JSON.stringify(s1Pub.features) === '["Validation des livreurs","Statistiques"]' && s1Pub.technologies.length === 2 && s1Pub.liveUrl === 'https://admin.example.com' && s1Pub.kind === 'web' && s1Pub.repos[0]?.label === 'Admin', s1Pub);
   await call('PATCH', `/admin/projects/${proj.data.id}`, { hasSubprojects: false });
   const delImg = await call('DELETE', `/admin/projects/${proj.data.id}/images/${imgs[0].id}`);
   check('supprimer une photo (fichier compris)', delImg.status === 200 && (await fetch(shots[0].url)).status === 404);
@@ -407,7 +416,7 @@ async function main() {
   // Réseaux : on remet ce qu'il y avait avant le test.
   await call('PATCH', '/admin/info', {
     github: info0.github ?? '', linkedin: info0.linkedin ?? '', instagram: info0.instagram ?? '', facebook: info0.facebook ?? '',
-    x: info0.x ?? '', youtube: info0.youtube ?? '', behance: info0.behance ?? '', dribbble: info0.dribbble ?? '',
+    x: info0.x ?? '', youtube: info0.youtube ?? '', tiktok: info0.tiktok ?? '',
   });
   check('réseaux d’origine rétablis', (await call('GET', '/admin/info')).data.github === info0.github);
 

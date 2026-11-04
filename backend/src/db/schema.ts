@@ -25,9 +25,11 @@ export const projectContext = pgEnum('project_context', ['client', 'personal', '
  */
 export const LOCALES = ['fr', 'en', 'es', 'ar'] as const;
 
-/** Plateformes d'un sous-projet. */
-export const PLATFORMS = ['web', 'android', 'ios', 'desktop'] as const;
-export type Platform = (typeof PLATFORMS)[number];
+/** Un dépôt GitHub d'un projet : { label: 'Back', url: 'https://github.com/…' }. */
+export interface Repo {
+  label: string;
+  url: string;
+}
 export type Locale = (typeof LOCALES)[number];
 
 // ─── Administrateur (un seul compte) ────────────────────────────────────────
@@ -89,8 +91,7 @@ export const info = pgTable('info', {
   facebook: varchar('facebook', { length: 160 }),
   x: varchar('x', { length: 160 }),
   youtube: varchar('youtube', { length: 160 }),
-  behance: varchar('behance', { length: 160 }),
-  dribbble: varchar('dribbble', { length: 160 }),
+  tiktok: varchar('tiktok', { length: 160 }),
 
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -237,9 +238,15 @@ export const projects = pgTable(
     /** Image de couverture. NULL = la 1re photo de la galerie. */
     imageUrl: text('image_url'),
     imagePublicId: text('image_public_id'),
-    /** Lien vers le site / l'application en ligne. NULL = pas de bouton. */
+    /** Lien du site / de l'application web. NULL = pas de bouton. */
     liveUrl: text('live_url'),
-    githubUrl: text('github_url'),
+    /** Application mobile publiée. */
+    playStoreUrl: text('play_store_url'),
+    appStoreUrl: text('app_store_url'),
+    /** Logiciel : lien de téléchargement. */
+    downloadUrl: text('download_url'),
+    /** 1 ou 2 dépôts GitHub, chacun avec un nom facultatif (« Front », « Back »). */
+    repos: jsonb('repos').$type<Repo[]>().notNull().default([]),
 
     /** Mis en avant en haut de la section « Projets ». */
     featured: boolean('featured').notNull().default(false),
@@ -295,11 +302,18 @@ export const projectSections = pgTable(
     highlightsEn: text('highlights_en'),
     highlightsEs: text('highlights_es'),
     highlightsAr: text('highlights_ar'),
-    /** ['web', 'android', 'ios', 'desktop'] */
-    platforms: jsonb('platforms').$type<Platform[]>().notNull().default([]),
+    /** Type du sous-projet : web, mobile ou logiciel. NULL = non précisé. */
+    kind: projectCategory('kind'),
     technologies: jsonb('technologies').$type<string[]>().notNull().default([]),
+    /** Lien du site / de l'application web. NULL = pas de bouton. */
     liveUrl: text('live_url'),
-    githubUrl: text('github_url'),
+    /** Application mobile publiée. */
+    playStoreUrl: text('play_store_url'),
+    appStoreUrl: text('app_store_url'),
+    /** Logiciel : lien de téléchargement. */
+    downloadUrl: text('download_url'),
+    /** 1 ou 2 dépôts GitHub, chacun avec un nom facultatif (« Front », « Back »). */
+    repos: jsonb('repos').$type<Repo[]>().notNull().default([]),
 
     order: integer('order').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -361,5 +375,5 @@ export type ProjectImage = typeof projectImages.$inferSelect;
 export type Message = typeof messages.$inferSelect;
 
 /** Les réseaux gérés par l'admin, dans l'ordre d'affichage sur le site. */
-export const SOCIAL_KEYS = ['github', 'linkedin', 'instagram', 'facebook', 'x', 'youtube', 'behance', 'dribbble'] as const;
+export const SOCIAL_KEYS = ['github', 'linkedin', 'instagram', 'facebook', 'x', 'youtube', 'tiktok'] as const;
 export type SocialKey = (typeof SOCIAL_KEYS)[number];

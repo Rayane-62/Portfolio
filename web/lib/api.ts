@@ -19,8 +19,7 @@ export const SOCIAL_KEYS = [
   "facebook",
   "x",
   "youtube",
-  "behance",
-  "dribbble",
+  "tiktok",
 ] as const;
 export type SocialKey = (typeof SOCIAL_KEYS)[number];
 
@@ -76,7 +75,15 @@ export type Education = {
 export type ProjectCategory = "web" | "mobile" | "desktop";
 export type ProjectStatus = "live" | "completed" | "coming_soon" | "in_progress";
 export type ProjectContext = "client" | "personal" | "academic" | "internship";
-export type Platform = "web" | "android" | "ios" | "desktop";
+/** Liens d'un projet ou d'un sous-projet. null / [] = pas de bouton. */
+export type ProjectLinkSet = {
+  liveUrl: string | null;
+  playStoreUrl: string | null;
+  appStoreUrl: string | null;
+  downloadUrl: string | null;
+  /** 0 à 2 dépôts, chacun avec un nom facultatif (« Front », « Back »). */
+  repos: { label: string; url: string }[];
+};
 
 export type ProjectImage = {
   id: number;
@@ -100,12 +107,11 @@ export type ProjectSection = {
   description: string | null;
   features: string[];
   highlights: string[];
-  platforms: Platform[];
+  /** Web, mobile ou logiciel. null = non précisé. */
+  kind: ProjectCategory | null;
   technologies: string[];
-  liveUrl: string | null;
-  githubUrl: string | null;
   images: ProjectImage[];
-};
+} & ProjectLinkSet;
 
 export type Project = {
   id: number;
@@ -123,13 +129,11 @@ export type Project = {
   technologies: string[];
   /** Couverture : image choisie ou 1re photo de la galerie. */
   coverUrl: string | null;
-  liveUrl: string | null;
-  githubUrl: string | null;
   featured: boolean;
   sections: ProjectSection[];
   /** Toutes les parties, y compris celles sans photo. */
   parts: { title: string; subtitle: string | null }[];
-};
+} & ProjectLinkSet;
 
 export type Portfolio = {
   locale: Locale;
@@ -171,8 +175,7 @@ const FALLBACK_INFO: Info = {
     facebook: null,
     x: null,
     youtube: null,
-    behance: null,
-    dribbble: null,
+    tiktok: null,
   },
 };
 
@@ -207,12 +210,13 @@ function normalize(raw: unknown, locale: Locale): Portfolio {
           categories: Array.isArray(p.categories) ? p.categories : [],
           technologies: Array.isArray(p.technologies) ? p.technologies : [],
           hasSubprojects: !!p.hasSubprojects,
+          repos: Array.isArray(p.repos) ? p.repos : [],
           sections: Array.isArray(p.sections)
             ? p.sections.map((s) => ({
                 ...s,
                 features: Array.isArray(s.features) ? s.features : [],
                 highlights: Array.isArray(s.highlights) ? s.highlights : [],
-                platforms: Array.isArray(s.platforms) ? s.platforms : [],
+                repos: Array.isArray(s.repos) ? s.repos : [],
                 technologies: Array.isArray(s.technologies) ? s.technologies : [],
                 images: Array.isArray(s.images) ? s.images : [],
               }))

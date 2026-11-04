@@ -251,7 +251,7 @@ async function importProjects(db: Database, rows: Row[]) {
       imageUrl: str(row, 'image_url'),
       imagePublicId: str(row, 'image_public_id'),
       liveUrl: str(row, 'live_url'),
-      githubUrl: str(row, 'github_url'),
+      repos: str(row, 'github_url') ? [{ label: '', url: str(row, 'github_url')! }] : [],
       featured: bool(row, 'featured'),
       visible: bool(row, 'visible', true),
       order: num(row, 'order', i + 1),

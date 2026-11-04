@@ -127,6 +127,5 @@ export class UpdateInfoDto {
   @Reseau() facebook?: string | null;
   @Reseau() x?: string | null;
   @Reseau() youtube?: string | null;
-  @Reseau() behance?: string | null;
-  @Reseau() dribbble?: string | null;
+  @Reseau() tiktok?: string | null;
 }

@@ -3,6 +3,8 @@ import { type ChangeEvent, type DragEvent, type FormEvent, useEffect, useRef, us
 import { Link, useBlocker, useNavigate, useParams } from 'react-router';
 import { IconClose, IconExternal, IconGithub, IconImage, IconLayers, IconStar, IconTrash } from '@/components/icons';
 import { ProjectGallery } from '@/components/project-gallery';
+import { ProjectLinks } from '@/components/project-links';
+import { linksError, linksOf, linksPayload, type LinksValue } from '@/lib/links';
 import {
   Button, ErrorText, Field, LangNote, LangPicker, LoadError, Loading, PageHeader, SaveBar, Segmented, Spinner, SwitchRow, TechInput, TransField,
 } from '@/components/ui';
@@ -31,8 +33,7 @@ interface FormState {
   technologies: string[];
   imageUrl: string | null;
   imagePublicId: string | null;
-  liveUrl: string;
-  githubUrl: string;
+  links: LinksValue;
   featured: boolean;
   visible: boolean;
 }
@@ -46,8 +47,7 @@ const empty = (): FormState => ({
   technologies: [],
   imageUrl: null,
   imagePublicId: null,
-  liveUrl: '',
-  githubUrl: '',
+  links: linksOf({ liveUrl: null, playStoreUrl: null, appStoreUrl: null, downloadUrl: null, repos: [] }),
   featured: false,
   visible: true,
 });
@@ -63,8 +63,7 @@ const fromProject = (p: Project): FormState => ({
   technologies: p.technologies,
   imageUrl: p.imageUrl,
   imagePublicId: p.imagePublicId,
-  liveUrl: p.liveUrl ?? '',
-  githubUrl: p.githubUrl ?? '',
+  links: linksOf(p),
   featured: p.featured,
   visible: p.visible,
 });
@@ -153,8 +152,7 @@ function ProjectForm({ project }: { project: Project | null }) {
         technologies: f.technologies,
         imageUrl: f.imageUrl,
         imagePublicId: f.imagePublicId,
-        liveUrl: f.liveUrl.trim(),
-        githubUrl: f.githubUrl.trim(),
+        ...linksPayload(f.links, f.categories),
         featured: f.featured,
         visible: f.visible,
       };
@@ -171,7 +169,7 @@ function ProjectForm({ project }: { project: Project | null }) {
     const json = payload();
     if (!f.texts.title.fr.trim()) json.title = 'Nouveau projet';
     if (!f.categories.length) json.categories = ['web'];
-    for (const k of ['liveUrl', 'githubUrl'] as const) if (!/^https?:\/\//.test(f[k].trim())) json[k] = '';
+    if (linksError(f.links)) Object.assign(json, { liveUrl: '', playStoreUrl: '', appStoreUrl: '', downloadUrl: '', repos: [] });
     json.visible = false;
     const created = await api<Project>('/admin/projects', { method: 'POST', json });
     refresh(keys.projects);
@@ -221,10 +219,8 @@ function ProjectForm({ project }: { project: Project | null }) {
     e?.preventDefault();
     if (!f.texts.title.fr.trim()) { setLoc('fr'); return setError('Donne un titre au projet (en français).'); }
     if (!f.categories.length) return setError('Choisis au moins une catégorie (web, mobile ou logiciel).');
-    for (const [k, label] of [['liveUrl', 'Le lien du site en ligne'], ['githubUrl', 'Le lien GitHub']] as const) {
-      const v = f[k].trim();
-      if (v && !/^https?:\/\//.test(v)) return setError(`${label} doit commencer par https://`);
-    }
+    const linkErr = linksError(f.links);
+    if (linkErr) return setError(linkErr);
     save.mutate();
   }
 
@@ -374,14 +370,9 @@ function ProjectForm({ project }: { project: Project | null }) {
             />
           </section>
 
-          <section className="panel grid grid-cols-2 gap-3.5 max-sm:grid-cols-1">
-            <h2 className="panel-title col-span-full m-0!">Liens <span className="label">Vide = pas de bouton</span></h2>
-            <Field label="Site en ligne">
-              <input className="input" value={f.liveUrl} onChange={(e) => set('liveUrl', e.target.value)} placeholder="https://caba-beauty.dz" inputMode="url" maxLength={1000} />
-            </Field>
-            <Field label="Dépôt GitHub">
-              <input className="input" value={f.githubUrl} onChange={(e) => set('githubUrl', e.target.value)} placeholder="https://github.com/Rayane-62/mon-projet" inputMode="url" maxLength={1000} />
-            </Field>
+          <section className="panel flex flex-col gap-3.5">
+            <h2 className="panel-title m-0!">Liens <span className="label">Selon les catégories · vide = pas de bouton</span></h2>
+            <ProjectLinks kinds={f.categories} value={f.links} onChange={(v) => set('links', v)} />
           </section>
 
           <section className="panel">
@@ -442,8 +433,8 @@ function ProjectForm({ project }: { project: Project | null }) {
                 </div>
               )}
               <div className="mt-1 flex gap-2">
-                {f.liveUrl.trim() && <span className="btn btn-sm pointer-events-none"><IconExternal size={14} /> Voir</span>}
-                {f.githubUrl.trim() && <span className="btn btn-ghost btn-sm pointer-events-none"><IconGithub size={14} /> Code</span>}
+                {f.links.liveUrl.trim() && <span className="btn btn-sm pointer-events-none"><IconExternal size={14} /> Voir</span>}
+                {f.links.repos.some((r) => r.url.trim()) && <span className="btn btn-ghost btn-sm pointer-events-none"><IconGithub size={14} /> Code</span>}
               </div>
             </div>
           </div>

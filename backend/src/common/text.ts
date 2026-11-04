@@ -19,8 +19,7 @@ const HOSTS: Record<SocialKey, RegExp> = {
   facebook: /^https?:\/\/(www\.|m\.|web\.)?(facebook|fb)\.com\//i,
   x: /^https?:\/\/(www\.)?(x|twitter)\.com\//i,
   youtube: /^https?:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//i,
-  behance: /^https?:\/\/(www\.)?behance\.net\//i,
-  dribbble: /^https?:\/\/(www\.)?dribbble\.com\//i,
+  tiktok: /^https?:\/\/(www\.|m\.)?tiktok\.com\/@?/i,
 };
 
 /**
@@ -68,9 +67,7 @@ export function socialUrl(kind: SocialKey, handle: string | null | undefined): s
     // Une chaîne YouTube s'écrit « @pseudo », sauf les anciennes adresses « channel/UC… » ou « c/… ».
     case 'youtube':
       return /^(channel|c|user)\//i.test(h) ? `https://www.youtube.com/${path}` : `https://www.youtube.com/@${path}`;
-    case 'behance':
-      return `https://www.behance.net/${path}`;
-    case 'dribbble':
-      return `https://dribbble.com/${path}`;
+    case 'tiktok':
+      return `https://www.tiktok.com/@${path}`;
   }
 }

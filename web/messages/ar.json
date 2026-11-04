@@ -113,12 +113,7 @@
     "subprojects": "المشاريع الفرعية",
     "subCount": "{count, plural, zero {# مشروع فرعي} one {مشروع فرعي واحد} two {مشروعان فرعيان} few {# مشاريع فرعية} many {# مشروعًا فرعيًا} other {# مشروع فرعي}}",
     "openSub": "عرض التفاصيل",
-    "platforms": {
-      "web": "ويب",
-      "android": "أندرويد",
-      "ios": "iOS",
-      "desktop": "سطح المكتب"
-    }
+    "ctaDownload": "تحميل"
   },
   "Contact": {
     "eyebrow": "اتصل",

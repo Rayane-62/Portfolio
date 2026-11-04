@@ -1082,9 +1082,17 @@ html[dir="rtl"] .hero {
 /* ---------- projets ---------- */
 .proj-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 18px;
+  /* largeur fixe : un projet seul reste une petite carte, pas une bannière */
+  grid-template-columns: repeat(auto-fill, minmax(240px, 290px));
+  justify-content: start;
+  gap: 16px;
   perspective: 1200px;
+}
+@media (max-width: 620px) {
+  .proj-grid {
+    grid-template-columns: minmax(0, 340px);
+    justify-content: center;
+  }
 }
 .proj {
   padding: 0;

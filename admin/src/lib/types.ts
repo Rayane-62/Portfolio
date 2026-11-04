@@ -5,8 +5,12 @@ export type SkillCategory = 'frontend' | 'backend' | 'mobile' | 'tools';
 export type ProjectCategory = 'web' | 'mobile' | 'desktop';
 export type ProjectStatus = 'live' | 'completed' | 'coming_soon' | 'in_progress';
 export type ProjectContext = 'client' | 'personal' | 'academic' | 'internship';
-export type Platform = 'web' | 'android' | 'ios' | 'desktop';
-export type SocialKey = 'github' | 'linkedin' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'behance' | 'dribbble';
+/** Un dépôt GitHub : { label: 'Back', url: 'https://github.com/…' }. */
+export interface Repo {
+  label: string;
+  url: string;
+}
+export type SocialKey = 'github' | 'linkedin' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'tiktok';
 
 export interface Me {
   id: number;
@@ -50,8 +54,7 @@ export interface Info {
   facebook: string | null;
   x: string | null;
   youtube: string | null;
-  behance: string | null;
-  dribbble: string | null;
+  tiktok: string | null;
   updatedAt: string;
 }
 
@@ -153,9 +156,12 @@ export interface Project {
   /** Couverture choisie. null = la 1re photo de la galerie. */
   imageUrl: string | null;
   imagePublicId: string | null;
-  /** Lien du site / de l'application en ligne. null = pas de bouton. */
+  /** Liens : null / [] = pas de bouton. */
   liveUrl: string | null;
-  githubUrl: string | null;
+  playStoreUrl: string | null;
+  appStoreUrl: string | null;
+  downloadUrl: string | null;
+  repos: Repo[];
   /** Remonté en haut de la section « Projets » du site. */
   featured: boolean;
   /** false = gardé ici, masqué sur le site. */
@@ -214,10 +220,14 @@ export interface ProjectSection {
   highlightsEn: string | null;
   highlightsEs: string | null;
   highlightsAr: string | null;
-  platforms: Platform[];
+  /** Web, mobile ou logiciel. null = non précisé. */
+  kind: ProjectCategory | null;
   technologies: string[];
   liveUrl: string | null;
-  githubUrl: string | null;
+  playStoreUrl: string | null;
+  appStoreUrl: string | null;
+  downloadUrl: string | null;
+  repos: Repo[];
   order: number;
   images: ProjectImage[];
 }

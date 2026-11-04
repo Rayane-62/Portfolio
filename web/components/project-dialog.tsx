@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { IconChevron, IconClose, IconExternal } from "@/components/icons";
-import type { Project, ProjectImage, ProjectSection } from "@/lib/api";
+import { IconChevron, IconClose } from "@/components/icons";
+import { hasLinks, ProjectLinks } from "@/components/project-links";
+import type { Project, ProjectImage, ProjectLinkSet, ProjectSection } from "@/lib/api";
 
 /**
  * Fenêtre de détail d'un projet. <dialog> natif : Échap ferme, le focus reste dedans.
@@ -56,14 +57,10 @@ export function ProjectDialog({ project: p, onClose }: { project: Project; onClo
               </p>
             )}
             <h2 id={`pd-title-${p.id}`}>{sub ? sub.title : p.title}</h2>
-            {sub && (sub.status || sub.platforms.length > 0) && (
+            {sub && (sub.status || sub.kind) && (
               <p className="pd-badges pd-under">
                 {sub.status && <span className={`badge st-${sub.status}`}>{t(`status.${sub.status}`)}</span>}
-                {sub.platforms.map((pl) => (
-                  <span className="badge" key={pl}>
-                    {t(`platforms.${pl}`)}
-                  </span>
-                ))}
+                {sub.kind && <span className="badge">{t(`categories.${sub.kind}`)}</span>}
               </p>
             )}
           </div>
@@ -118,11 +115,7 @@ function SubCard({ sub, onOpen }: { sub: ProjectSection; onOpen: () => void }) {
         {sub.summary && <span className="subt">{sub.summary}</span>}
         <span className="plats">
           {sub.status && <span className={`badge st-${sub.status}`}>{t(`status.${sub.status}`)}</span>}
-          {sub.platforms.map((pl) => (
-            <span className="badge" key={pl}>
-              {t(`platforms.${pl}`)}
-            </span>
-          ))}
+          {sub.kind && <span className="badge">{t(`categories.${sub.kind}`)}</span>}
           {sub.images.length > 0 && <span className="count">{t("shots", { count: sub.images.length })}</span>}
         </span>
         <span className="go">
@@ -152,7 +145,7 @@ function SubprojectView({ project: p, sub }: { project: Project; sub: ProjectSec
         </div>
         <aside className="pd-side">
           <Stack technologies={sub.technologies} />
-          <Links liveUrl={sub.liveUrl} githubUrl={sub.githubUrl} />
+          <Links links={sub} />
         </aside>
       </div>
     </>
@@ -291,7 +284,7 @@ function Details({ project: p, showParts }: { project: Project; showParts: boole
           </>
         )}
         <Stack technologies={p.technologies} />
-        <Links liveUrl={p.liveUrl} githubUrl={p.githubUrl} />
+        <Links links={p} />
       </aside>
     </div>
   );
@@ -339,23 +332,11 @@ function Stack({ technologies }: { technologies: string[] }) {
   );
 }
 
-function Links({ liveUrl, githubUrl }: { liveUrl: string | null; githubUrl: string | null }) {
-  const t = useTranslations("Projects");
-  if (!liveUrl && !githubUrl) return null;
+function Links({ links }: { links: ProjectLinkSet }) {
+  if (!hasLinks(links)) return null;
   return (
     <div className="links">
-      {liveUrl && (
-        <a className="mini mini-accent" href={liveUrl} target="_blank" rel="noopener">
-          <IconExternal />
-          {t("ctaLive")}
-        </a>
-      )}
-      {githubUrl && (
-        <a className="mini" href={githubUrl} target="_blank" rel="noopener">
-          <IconExternal />
-          {t("ctaCode")}
-        </a>
-      )}
+      <ProjectLinks links={links} />
     </div>
   );
 }

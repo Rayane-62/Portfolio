@@ -76,8 +76,7 @@ export const IconInstagram = (p: P) => <Svg {...p}><rect x="4" y="4" width="16" 
 export const IconFacebook = (p: P) => <Svg {...p}><path d="M14 21v-8h3l.5-3.5H14V7.8c0-1 .4-1.8 1.8-1.8h1.9V3.1A20 20 0 0015 3c-2.7 0-4.5 1.6-4.5 4.6v1.9H7.5V13h3v8" /></Svg>;
 export const IconX = (p: P) => <Svg {...p}><path d="M4 4l16 16M20 4L4 20" /></Svg>;
 export const IconYoutube = (p: P) => <Svg {...p}><rect x="2.5" y="6" width="19" height="12" rx="4" /><path d="M11 9.5l4 2.5-4 2.5z" /></Svg>;
-export const IconBehance = (p: P) => <Svg {...p}><path d="M3 5.5h5a3 3 0 010 6H3zM3 11.5h5.5a3.2 3.2 0 010 6.5H3zM14 14.5h7a3.5 3.5 0 10-7 0c0 2 1.6 3.5 3.5 3.5 1.3 0 2.4-.6 3-1.6" /></Svg>;
-export const IconDribbble = (p: P) => <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M5 7.5c4 .3 8.6 2.2 11.3 6.5M3.5 14c3.6-1.6 9-1.6 12.5 2.8M9.2 3.6c3.5 3.4 5.4 8 5.8 13" /></Svg>;
+export const IconTiktok = (p: P) => <Svg {...p}><path d="M14 3v11.5a3.5 3.5 0 11-3.5-3.5M14 3c.4 2.6 2.2 4.4 5 4.6" /></Svg>;
 
 const SOCIAL_ICONS: Record<SocialKey, (p: P) => ReactNode> = {
   github: IconGithub,
@@ -86,8 +85,7 @@ const SOCIAL_ICONS: Record<SocialKey, (p: P) => ReactNode> = {
   facebook: IconFacebook,
   x: IconX,
   youtube: IconYoutube,
-  behance: IconBehance,
-  dribbble: IconDribbble,
+  tiktok: IconTiktok,
 };
 
 /** L'icône d'un réseau social, choisie par sa clé (github, linkedin…). */

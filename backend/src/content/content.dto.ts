@@ -15,6 +15,7 @@ import {
   Matches,
   MaxLength,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
 import {
   projectCategory,
@@ -23,8 +24,6 @@ import {
   ProjectContext,
   projectStatus,
   ProjectStatus,
-  PLATFORMS,
-  type Platform,
   skillCategory,
   SkillCategory,
 } from '../db/schema';
@@ -62,6 +61,35 @@ function Lien(message: string) {
     ValidateIf((_, v) => v !== null),
     Matches(/^https?:\/\//, { message }),
     MaxLength(1000),
+  );
+}
+
+/** Un dépôt GitHub : nom facultatif (« Front », « Back ») + lien. */
+export class RepoDto {
+  @IsOptional()
+  @Transform(trim)
+  @IsString()
+  @MaxLength(40, { message: '40 caractères maximum pour le nom du dépôt' })
+  label: string = '';
+
+  @Transform(trim)
+  @IsString()
+  @Matches(/^https?:\/\//, { message: 'Le lien du dépôt doit commencer par https://' })
+  @MaxLength(1000)
+  url: string;
+}
+
+/** 0 à 2 dépôts. Les lignes sans lien sont retirées. */
+function Depots() {
+  return applyDecorators(
+    IsOptional(),
+    Transform(({ value }) =>
+      Array.isArray(value) ? value.filter((r) => r && typeof r.url === 'string' && r.url.trim()) : value,
+    ),
+    IsArray(),
+    ArrayMaxSize(2, { message: '2 dépôts maximum' }),
+    ValidateNested({ each: true }),
+    Type(() => RepoDto),
   );
 }
 
@@ -305,8 +333,11 @@ export class CreateProjectDto {
   @MaxLength(300)
   imagePublicId?: string | null;
 
-  @Lien('Le lien du projet doit commencer par https://') liveUrl?: string | null;
-  @Lien('Le lien GitHub doit commencer par https://') githubUrl?: string | null;
+  @Lien('Le lien du site doit commencer par https://') liveUrl?: string | null;
+  @Lien('Le lien Google Play doit commencer par https://') playStoreUrl?: string | null;
+  @Lien("Le lien App Store doit commencer par https://") appStoreUrl?: string | null;
+  @Lien('Le lien de téléchargement doit commencer par https://') downloadUrl?: string | null;
+  @Depots() repos?: RepoDto[];
 
   /** Mis en avant en haut de la section « Projets ». */
   @IsOptional()
@@ -397,17 +428,20 @@ export class CreateSectionDto {
   @Traduction(4000) highlightsEs?: string | null;
   @Traduction(4000) highlightsAr?: string | null;
 
-  /** ['web', 'android', 'ios', 'desktop'] */
+  /** Web, mobile ou logiciel. NULL = non précisé. */
   @IsOptional()
-  @IsArray()
-  @ArrayUnique()
-  @IsIn(PLATFORMS, { each: true, message: 'Plateforme inconnue : web, android, ios ou desktop' })
-  platforms?: Platform[];
+  @Transform(emptyToNull)
+  @ValidateIf((_, v) => v !== null)
+  @IsIn(projectCategory.enumValues, { message: 'Type inconnu : web, mobile ou desktop' })
+  kind?: ProjectCategory | null;
 
   @Technologies() technologies?: string[];
 
-  @Lien('Le lien du sous-projet doit commencer par https://') liveUrl?: string | null;
-  @Lien('Le lien GitHub doit commencer par https://') githubUrl?: string | null;
+  @Lien('Le lien du site doit commencer par https://') liveUrl?: string | null;
+  @Lien('Le lien Google Play doit commencer par https://') playStoreUrl?: string | null;
+  @Lien("Le lien App Store doit commencer par https://") appStoreUrl?: string | null;
+  @Lien('Le lien de téléchargement doit commencer par https://') downloadUrl?: string | null;
+  @Depots() repos?: RepoDto[];
 }
 
 export class UpdateSectionDto extends PartialType(CreateSectionDto) {}

@@ -15,7 +15,8 @@ const FIELDS = [
   'features', 'featuresEn', 'featuresEs', 'featuresAr',
   'highlights', 'highlightsEn', 'highlightsEs', 'highlightsAr',
   'categories', 'status', 'context', 'team', 'hasSubprojects',
-  'technologies', 'imageUrl', 'imagePublicId', 'liveUrl', 'githubUrl', 'featured', 'visible',
+  'technologies', 'imageUrl', 'imagePublicId', 'featured', 'visible',
+  'liveUrl', 'playStoreUrl', 'appStoreUrl', 'downloadUrl', 'repos',
 ] as const;
 
 const SECTION_FIELDS = [
@@ -25,7 +26,7 @@ const SECTION_FIELDS = [
   'description', 'descriptionEn', 'descriptionEs', 'descriptionAr',
   'features', 'featuresEn', 'featuresEs', 'featuresAr',
   'highlights', 'highlightsEn', 'highlightsEs', 'highlightsAr',
-  'platforms', 'technologies', 'liveUrl', 'githubUrl',
+  'kind', 'technologies', 'liveUrl', 'playStoreUrl', 'appStoreUrl', 'downloadUrl', 'repos',
 ] as const;
 
 export type SectionWithImages = ProjectSection & { images: ProjectImage[] };

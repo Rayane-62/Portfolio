@@ -113,12 +113,7 @@
     "subprojects": "Sous-projets",
     "subCount": "{count, plural, one {# sous-projet} other {# sous-projets}}",
     "openSub": "Voir le détail",
-    "platforms": {
-      "web": "Web",
-      "android": "Android",
-      "ios": "iOS",
-      "desktop": "Desktop"
-    }
+    "ctaDownload": "Télécharger"
   },
   "Contact": {
     "eyebrow": "Contact",

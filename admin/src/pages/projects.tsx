@@ -165,12 +165,12 @@ function Row({ p, index, count, busy, onMove, onDelete }: { p: ProjectListItem; 
               <IconExternal size={15} /> Voir en ligne
             </a>
           )}
-          {p.githubUrl && (
-            <a href={p.githubUrl} target="_blank" rel="noopener" className="flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-accent-3">
-              <IconGithub size={15} /> Code
+          {p.repos.map((r) => (
+            <a key={r.url} href={r.url} target="_blank" rel="noopener" className="flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-accent-3">
+              <IconGithub size={15} /> {r.label || 'Code'}
             </a>
-          )}
-          {!p.liveUrl && !p.githubUrl && <span className="note">Aucun lien renseigné</span>}
+          ))}
+          {!p.liveUrl && !p.playStoreUrl && !p.appStoreUrl && !p.downloadUrl && !p.repos.length && <span className="note">Aucun lien renseigné</span>}
         </span>
         <span className="flex gap-2">
           <Link to={`/projets/${p.id}`} className="btn btn-ghost btn-sm"><IconEdit size={15} /> Modifier</Link>
