@@ -38,8 +38,8 @@ export function DashboardPage() {
 /** Ce qu'il reste à faire pour que le site soit complet : rappels de l'API + lien LinkedIn cassé. */
 function todoList(d: Dashboard, info: Info | undefined) {
   const items: { key: string; label: string; detail: string; to: string; Icon: typeof IconImage }[] = [];
-  if (d.todo.photo) items.push({ key: 'photo', label: 'Ajoute ta photo', detail: "Le site affiche un bloc vide à la place de ton portrait.", to: '/profil?onglet=fichiers', Icon: IconImage });
-  if (d.todo.cv) items.push({ key: 'cv', label: 'Envoie ton CV (PDF)', detail: 'Sans CV, le bouton « Télécharger mon CV » ne s\'affiche pas.', to: '/profil?onglet=fichiers', Icon: IconFile });
+  if (d.todo.photo) items.push({ key: 'photo', label: 'Ajoute ta photo', detail: "Le site affiche un bloc vide à la place de ton portrait.", to: '/profil', Icon: IconImage });
+  if (d.todo.cv) items.push({ key: 'cv', label: 'Envoie ton CV (PDF)', detail: 'Sans CV, le bouton « Télécharger mon CV » ne s\'affiche pas.', to: '/profil', Icon: IconFile });
   if (d.todo.bio) items.push({ key: 'bio', label: 'Écris ta biographie', detail: 'Le texte du « À propos » est vide.', to: '/profil', Icon: IconIdCard });
   if (d.todo.projects) items.push({ key: 'projects', label: 'Ajoute un premier projet', detail: 'La section « Projets » du site est vide pour le moment.', to: '/projets/nouveau', Icon: IconLayers });
   if (badHandle(info?.linkedin)) {

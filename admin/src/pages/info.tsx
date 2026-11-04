@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { type ChangeEvent, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { IconClose, IconExternal, IconFile, IconImage, IconUser, SocialIcon } from '@/components/icons';
+import { IconExternal, IconFile, IconImage, IconTrash, IconUser, SocialIcon } from '@/components/icons';
 import {
   Button, ErrorText, Field, Help, LangNote, LangPicker, LoadError, Loading, PageHeader, SaveBar, Spinner, SwitchRow, TransField,
 } from '@/components/ui';
@@ -11,13 +11,12 @@ import { keys, queryClient, useInfo } from '@/lib/queries';
 import type { Info, Locale, SocialKey } from '@/lib/types';
 import { confirm, toast } from '@/store/ui';
 
-type Tab = 'identite' | 'contact' | 'chiffres' | 'reseaux' | 'fichiers';
+type Tab = 'identite' | 'contact' | 'chiffres' | 'reseaux';
 const TABS: [Tab, string][] = [
   ['identite', 'Identité'],
   ['contact', 'Contact'],
   ['chiffres', 'Chiffres'],
   ['reseaux', 'Réseaux'],
-  ['fichiers', 'Photo & CV'],
 ];
 
 const TEXT_FIELDS = ['title', 'bio'] as const;
@@ -64,19 +63,21 @@ const toDraft = (i: Info): Draft => ({
 
 export function InfoPage() {
   const q = useInfo();
+  const [version, setVersion] = useState(0);
   if (q.isPending) return <Loading rows={3} />;
   if (q.isError) return <LoadError error={q.error} retry={q.refetch} />;
-  // Après « Enregistrer », le formulaire repart des valeurs enregistrées.
-  return <InfoForm key={q.data.updatedAt} info={q.data} />;
+  // Après « Enregistrer », le formulaire repart des valeurs enregistrées. Un rechargement en arrière-plan
+  // (mise à jour en direct, retour sur l'onglet) ne le remet pas à zéro : les modifications en cours sont gardées.
+  return <InfoForm key={version} info={q.data} onSaved={() => setVersion((v) => v + 1)} />;
 }
 
-function InfoForm({ info }: { info: Info }) {
+function InfoForm({ info, onSaved }: { info: Info; onSaved: () => void }) {
   const [sp, setSp] = useSearchParams();
   const rawTab = sp.get('onglet');
   const tab: Tab = TABS.some(([k]) => k === rawTab) ? (rawTab as Tab) : 'identite';
   const [loc, setLoc] = useState<Locale>('fr');
   const [d, setD] = useState<Draft>(() => toDraft(info));
-  const [initial] = useState(() => JSON.stringify(toDraft(info)));
+  const [initial, setInitial] = useState(() => JSON.stringify(toDraft(info)));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState<'photo' | 'cv' | null>(null);
   const photoInput = useRef<HTMLInputElement>(null);
@@ -117,7 +118,7 @@ function InfoForm({ info }: { info: Info }) {
       for (const f of TEXT_FIELDS) for (const l of LOCALES) json[locField(f, l)] = d.texts[f][l].trim();
       return api<Info>('/admin/info', { method: 'PATCH', json });
     },
-    onSuccess: (i) => { queryClient.setQueryData(keys.info, i); queryClient.invalidateQueries({ queryKey: keys.dashboard }); toast('Profil enregistré — le site est à jour'); },
+    onSuccess: (i) => { queryClient.setQueryData(keys.info, i); queryClient.invalidateQueries({ queryKey: keys.dashboard }); toast('Profil enregistré — le site est à jour'); onSaved(); },
     onError: (e) => setError(errMsg(e)),
   });
 
@@ -130,6 +131,40 @@ function InfoForm({ info }: { info: Info }) {
     save.mutate();
   }
 
+  /**
+   * Photo et CV sont enregistrés tout de suite, sans attendre « Enregistrer » :
+   * le reste du formulaire (même modifié) n'est pas touché.
+   */
+  type FilePatch = Partial<Pick<Draft, 'photoUrl' | 'photoPublicId' | 'cvUrl' | 'cvPublicId'>>;
+  async function saveFiles(patch: FilePatch, message: string) {
+    await api<Info>('/admin/info', { method: 'PATCH', json: patch });
+    setD((s) => ({ ...s, ...patch }));
+    setInitial((prev) => JSON.stringify({ ...JSON.parse(prev), ...patch }));
+    // Même date de modification : le formulaire n'est pas rechargé, les autres champs en cours sont gardés.
+    queryClient.setQueryData<Info>(keys.info, (old) => (old ? { ...old, ...patch } : old));
+    queryClient.invalidateQueries({ queryKey: keys.dashboard });
+    toast(message);
+  }
+  async function removeFile(kind: 'photo' | 'cv') {
+    const ok = await confirm(
+      kind === 'photo'
+        ? { title: 'Supprimer la photo ?', message: 'Le site affichera un bloc vide à la place de ton portrait.', confirmLabel: 'Supprimer', danger: true }
+        : { title: 'Supprimer le CV ?', message: 'Le bouton « Télécharger mon CV » disparaîtra du site.', confirmLabel: 'Supprimer', danger: true },
+    );
+    if (!ok) return;
+    setBusy(kind);
+    try {
+      await saveFiles(
+        kind === 'photo' ? { photoUrl: null, photoPublicId: null } : { cvUrl: null, cvPublicId: null },
+        kind === 'photo' ? 'Photo supprimée' : 'CV supprimé',
+      );
+    } catch (err) {
+      toast(errMsg(err), 'error');
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function sendPhoto(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -137,8 +172,7 @@ function InfoForm({ info }: { info: Info }) {
     setBusy('photo');
     try {
       const r = await upload(file, 'photo');
-      setD((s) => ({ ...s, photoUrl: r.url, photoPublicId: r.publicId }));
-      toast('Photo envoyée — pense à enregistrer');
+      await saveFiles({ photoUrl: r.url, photoPublicId: r.publicId }, 'Photo enregistrée — le site est à jour');
     } catch (err) {
       toast(errMsg(err), 'error');
     } finally {
@@ -153,8 +187,7 @@ function InfoForm({ info }: { info: Info }) {
     setBusy('cv');
     try {
       const r = await upload(file, 'cv');
-      setD((s) => ({ ...s, cvUrl: r.url, cvPublicId: r.publicId }));
-      toast('CV envoyé — pense à enregistrer');
+      await saveFiles({ cvUrl: r.url, cvPublicId: r.publicId }, 'CV enregistré — le site est à jour');
     } catch (err) {
       toast(errMsg(err), 'error');
     } finally {
@@ -181,6 +214,59 @@ function InfoForm({ info }: { info: Info }) {
         <div key={tab} className="reveal flex min-w-0 flex-col gap-[18px]">
           {tab === 'identite' && (
             <>
+              <section className="panel">
+                <h2 className="panel-title">Photo & CV <span className="label">Enregistrés dès l'envoi</span></h2>
+                <div className="grid grid-cols-2 gap-[18px] max-md:grid-cols-1">
+                  <div className="flex items-start gap-3.5">
+                    {d.photoUrl ? (
+                      <div className="ph-tile size-[104px] shrink-0"><img src={d.photoUrl} alt="Ta photo" /></div>
+                    ) : (
+                      <button type="button" onClick={() => photoInput.current?.click()} className="drop size-[104px] shrink-0 p-2! text-xs">
+                        {busy === 'photo' ? <Spinner className="text-accent-2" /> : <IconImage size={22} className="text-accent-2" />}
+                      </button>
+                    )}
+                    <div className="flex min-w-0 flex-col gap-2">
+                      <b className="text-sm">Photo de profil</b>
+                      <span className="note">Portrait net, de face. JPG, PNG, WebP — 15 Mo max.</span>
+                      <span className="flex flex-wrap gap-2">
+                        <Button size="sm" variant="ghost" onClick={() => photoInput.current?.click()} loading={busy === 'photo'}>
+                          <IconImage size={15} /> {d.photoUrl ? 'Changer' : 'Ajouter'}
+                        </Button>
+                        {d.photoUrl && (
+                          <Button size="sm" variant="bad" onClick={() => removeFile('photo')} disabled={busy !== null}>
+                            <IconTrash size={15} /> Supprimer
+                          </Button>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3.5">
+                    <span className="grid size-[104px] shrink-0 place-items-center rounded-xl border border-line-2 bg-sunk text-accent-3">
+                      {busy === 'cv' ? <Spinner /> : <IconFile size={28} />}
+                    </span>
+                    <div className="flex min-w-0 flex-col gap-2">
+                      <b className="text-sm">CV (PDF)</b>
+                      {d.cvUrl ? (
+                        <a href={d.cvUrl} target="_blank" rel="noopener" className="note truncate text-accent-3! hover:underline">Ouvrir le CV en ligne</a>
+                      ) : (
+                        <span className="note">Sans CV, le bouton « Télécharger mon CV » n'apparaît pas. PDF, 10 Mo max.</span>
+                      )}
+                      <span className="flex flex-wrap gap-2">
+                        <Button size="sm" variant="ghost" onClick={() => cvInput.current?.click()} loading={busy === 'cv'}>
+                          <IconFile size={15} /> {d.cvUrl ? 'Changer' : 'Ajouter'}
+                        </Button>
+                        {d.cvUrl && (
+                          <Button size="sm" variant="bad" onClick={() => removeFile('cv')} disabled={busy !== null}>
+                            <IconTrash size={15} /> Supprimer
+                          </Button>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <input ref={photoInput} type="file" accept="image/png,image/webp,image/jpeg,image/avif" hidden onChange={sendPhoto} />
+                <input ref={cvInput} type="file" accept="application/pdf" hidden onChange={sendCv} />
+              </section>
               <section className="panel flex flex-col gap-[18px]">
                 <h2 className="panel-title m-0!">
                   Identité
@@ -291,78 +377,7 @@ function InfoForm({ info }: { info: Info }) {
             </section>
           )}
 
-          {tab === 'fichiers' && (
-            <>
-              <section className="panel">
-                <h2 className="panel-title">Photo de profil</h2>
-                <div className="flex flex-wrap items-start gap-[18px]">
-                  {d.photoUrl ? (
-                    <div className="ph-tile size-[150px] shrink-0">
-                      <img src={d.photoUrl} alt="Ta photo" />
-                      <button
-                        type="button"
-                        aria-label="Retirer la photo"
-                        title="Retirer la photo"
-                        onClick={async () => {
-                          if (await confirm({ title: 'Retirer la photo ?', message: "Le site affichera un bloc vide à la place. Le fichier est supprimé du serveur à l'enregistrement.", confirmLabel: 'Retirer', danger: true })) {
-                            setD((s) => ({ ...s, photoUrl: null, photoPublicId: null }));
-                          }
-                        }}
-                        className="ph-btn top-2 right-2"
-                      >
-                        <IconClose size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <button type="button" onClick={() => photoInput.current?.click()} className="drop size-[150px] shrink-0 p-3! text-xs">
-                      {busy === 'photo' ? <Spinner className="text-accent-2" /> : <><IconImage size={22} className="text-accent-2" /><b className="text-fg">Ajouter ta photo</b></>}
-                    </button>
-                  )}
-                  <input ref={photoInput} type="file" accept="image/png,image/webp,image/jpeg,image/avif" hidden onChange={sendPhoto} />
-                  <div className="flex min-w-[220px] flex-1 flex-col gap-2.5">
-                    <p className="note m-0">
-                      Un portrait net, de face, de préférence carré. Le serveur la redresse, la réduit à 1200 px et la convertit en WebP :
-                      tu peux envoyer la photo telle qu'elle sort du téléphone (15 Mo maximum).
-                    </p>
-                    {d.photoUrl && <Button variant="ghost" size="sm" className="self-start" onClick={() => photoInput.current?.click()} loading={busy === 'photo'}>Remplacer la photo</Button>}
-                  </div>
-                </div>
-              </section>
 
-              <section className="panel">
-                <h2 className="panel-title">CV (PDF)</h2>
-                {d.cvUrl ? (
-                  <div className="flex flex-wrap items-center gap-3.5">
-                    <span className="grid size-[54px] shrink-0 place-items-center rounded-xl border border-line-2 bg-sunk text-accent-3"><IconFile size={24} /></span>
-                    <div className="min-w-0 flex-1">
-                      <b className="block text-sm">CV en ligne</b>
-                      <a href={d.cvUrl} target="_blank" rel="noopener" className="label block truncate normal-case text-accent-3! hover:underline">{d.cvUrl}</a>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={() => cvInput.current?.click()} loading={busy === 'cv'}>Remplacer</Button>
-                    <Button
-                      variant="bad"
-                      size="sm"
-                      onClick={async () => {
-                        if (await confirm({ title: 'Retirer le CV ?', message: "Le bouton « Télécharger mon CV » disparaîtra du site.", confirmLabel: 'Retirer', danger: true })) {
-                          setD((s) => ({ ...s, cvUrl: null, cvPublicId: null }));
-                        }
-                      }}
-                    >
-                      Retirer
-                    </Button>
-                  </div>
-                ) : (
-                  <button type="button" onClick={() => cvInput.current?.click()} className="drop">
-                    {busy === 'cv' ? <Spinner className="text-accent-2" /> : <IconFile size={24} className="text-accent-2" />}
-                    <b className="text-fg">{busy === 'cv' ? 'Envoi en cours…' : 'Envoyer ton CV'}</b>
-                    <span className="note">PDF uniquement, 10 Mo maximum.</span>
-                  </button>
-                )}
-                <input ref={cvInput} type="file" accept="application/pdf" hidden onChange={sendCv} />
-                <p className="note mt-3 mb-0">Sans CV, le bouton « Télécharger mon CV » ne s'affiche pas sur le site.</p>
-              </section>
-            </>
-          )}
 
           <ErrorText>{error}</ErrorText>
         </div>
