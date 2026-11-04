@@ -1,11 +1,17 @@
 import 'dotenv/config';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Client } from 'pg';
-import { createDb, createPool } from './client';
+import { createDb, createPool, dbUrl } from './client';
 
 /** Crée la base indiquée dans DATABASE_URL si elle n'existe pas encore (ex. « portfolio »). */
 async function ensureDatabase(url: string) {
-  const target = new URL(url);
+  let target: URL;
+  try {
+    target = new URL(url);
+  } catch {
+    // Sans afficher la valeur : elle contient le mot de passe.
+    throw new Error('DATABASE_URL invalide : attendu postgresql://utilisateur:motdepasse@hote/base');
+  }
   const name = decodeURIComponent(target.pathname.replace(/^\//, ''));
   if (!name) return;
   const admin = new URL(url);
@@ -28,8 +34,7 @@ async function ensureDatabase(url: string) {
 }
 
 async function main() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error('DATABASE_URL manquant dans le fichier .env');
+  const url = dbUrl();
   await ensureDatabase(url);
   const pool = createPool(url);
   const db = createDb(pool);
@@ -40,6 +45,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('✗ Échec des migrations :', err);
+  console.error('✗ Échec des migrations :', err instanceof Error ? err.message : err);
   process.exit(1);
 });

@@ -15,9 +15,17 @@ export interface CloudinaryConfig {
 }
 
 export function parseCloudinaryUrl(url: string | undefined): CloudinaryConfig | null {
-  if (!url?.trim()) return null;
-  const u = new URL(url.trim());
-  if (u.protocol !== 'cloudinary:' || !u.hostname || !u.username || !u.password) {
+  // Tolère « CLOUDINARY_URL=cloudinary://… » collé tel quel depuis un fichier .env.
+  const value = url?.trim().replace(/^CLOUDINARY_URL\s*=\s*/, '');
+  if (!value) return null;
+  let u: URL | null = null;
+  try {
+    u = new URL(value);
+  } catch {
+    u = null;
+  }
+  // Message volontairement sans la valeur : elle contient le secret.
+  if (!u || u.protocol !== 'cloudinary:' || !u.hostname || !u.username || !u.password) {
     throw new Error('CLOUDINARY_URL invalide : attendu cloudinary://<api_key>:<api_secret>@<cloud_name>');
   }
   return { cloud: u.hostname, key: decodeURIComponent(u.username), secret: decodeURIComponent(u.password) };
